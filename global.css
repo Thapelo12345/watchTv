@@ -1,0 +1,11 @@
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
+@import "tailwindcss/utilities.css";
+ 
+@import "nativewind/theme";
+
+@layer components{
+    .pageHeaders{
+        @apply text-green-500 text-4xl text-center m-5;
+    }
+}
