@@ -4,8 +4,31 @@
  
 @import "nativewind/theme";
 
-@layer components{
+@layer components {
     .pageHeaders{
-        @apply text-green-500 text-4xl text-center m-5;
+        @apply text-green-500 text-4xl text-center mb-2 mt-5;
     }
+
+    .card{
+        @apply m-1 overflow-hidden rounded-lg;
+        box-shadow: "1px 7px 8px white, 1px 2px 5.5px black";
+    }
+
+    .search-container{
+        @apply h-17 rounded-2xl flex flex-row items-center m-2 px-2 py-0;
+        box-shadow: "2px 5px 8px white, 1px 1px 4px black";
+    }
+
+    .search-input{
+        @apply mx-2 px-2 w-[75%];
+    }
+
+    .search-btn{
+        @apply m-2 bg-blue-200 p-2 rounded-lg;
+    }
+
+    .series-btn{
+        @apply border-2 border-white p-2 px-8 text-lg m-2 rounded-lg;
+    }
+
 }
