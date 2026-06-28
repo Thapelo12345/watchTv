@@ -1,23 +1,36 @@
-import { View, Text, FlatList, TouchableOpacity } from "react-native"
-import { router } from 'expo-router';
+import { View, Text, FlatList } from "react-native"
 import MovieContainer from "@/components/movieContainer"
 import { useMainStore } from "@/stateManagement/store";
+import { OnlineLoader } from "@/components/onlineLoader";
+import { usePathname } from 'expo-router';
 import { useEffect } from "react";
 
 export default function Movies(){
   const movies = useMainStore((state: any)=> state.movies)
 
+  const switchSearch = useMainStore((state: any)=> state.setSearching)
+  const searchOn = useMainStore((state: any)=> state.searching)
+  const searchedMovies = useMainStore((state: any)=> state.searchResults);
+
+  const pathname = usePathname()
+
+  useEffect(()=> {
+    if(searchOn && pathname !== "/movies") switchSearch()
+  }, [pathname])
+
     return(
-    <View>
-        <Text className="pageHeaders">Movies Page</Text>
+    <View className="page-containers">
+        <Text 
+        className="pageHeaders"
+        >Movies</Text>
 
         <FlatList 
             key={3}
             contentContainerClassName="pb-20"
             numColumns={3}
-            data={movies}
+            data={(pathname == "/movies" && searchOn) ? searchedMovies : movies}
             renderItem={({item}) => (
-              <View className="w-[30%] m-2">
+              <View className="w-auto m-2">
            
             <MovieContainer
             program={item}

@@ -1,6 +1,5 @@
 import { Text, Pressable, View } from "react-native";
 import DropDown from "./dropDown";
-import { useMainStore } from "@/stateManagement/store";
 import "../global.css";
 import { useEffect, useState } from "react";
 
@@ -20,44 +19,58 @@ export default function SelectComponent({
   setEpisode,
 }: PROPS) {
 
-const dropSeason = useMainStore((state:any)=> state.openSeason),
-       dropEpisode = useMainStore((state: any)=> state.openEpisode)
 
-  const openSeason = useMainStore((state: any) => state.openCloseSeason),
-   openEpisode = useMainStore((state: any) => state.openCloseEpisode);
+  const allSeasons: string[] = seasonsEpisode.map(
+    (currentSeason) => currentSeason.season,
+  );
 
-  const allSeasons: string[] = seasonsEpisode.map((currentSeason) => currentSeason.season);
-  const [allEpisode, setAllEpisode] = useState<string[]>([])
+  const [openSeasonDropDown, setSeasonDropDown] = useState(false)
+  const [openEpisodeDropDown, setEpisodeDropDown] = useState(false)
 
-  useEffect(()=>{
-    const activeSeason = seasonsEpisode.find((season)=> season.season == selectedSeason)
-    const episodeArray = activeSeason.episodes.map((episode: any)=> episode.name)
-    setAllEpisode(episodeArray)
-  }, [])
+  const [allEpisode, setAllEpisode] = useState<string[]>([]);
+
+  useEffect(() => {
+    const activeSeason = seasonsEpisode.find(
+      (season) => season.season == selectedSeason,
+    );
+    const episodeArray = activeSeason.episodes.map(
+      (episode: any) => episode.name,
+    );
+    setAllEpisode(episodeArray);
+  }, []);
 
   return (
-    <View className="flex flex-row items-center justify-evenly mt-10">
+    <View className="flex flex-row items-center justify-evenly mt-2">
       <View>
-        <Pressable
-          className="series-btn"
-          onPress={() => openSeason(true)}
-        >
-          <Text>{selectedSeason}</Text>
+        <Pressable className="series-btn" onPress={() => {
+         setSeasonDropDown(!openSeasonDropDown)
+         if(openEpisodeDropDown) setEpisodeDropDown(false)
+          }}>
+          <Text className="selected">{selectedSeason}</Text>
         </Pressable>
 
-        <DropDown showType="season" open={dropSeason} list={allSeasons} setSelected={setSeason} />
+        <DropDown
+          open={openSeasonDropDown}
+          list={allSeasons}
+          closeDropDown={setSeasonDropDown}
+          setSelected={setSeason}
+        />
       </View>
 
       <View>
-        <Pressable 
-        className="series-btn"
-        onPress={() => openEpisode(true)}
-        >
-          <Text>{selectedEpisode}</Text>
-        </Pressable> 
+        <Pressable className="series-btn" onPress={() => {
+          setEpisodeDropDown(!openEpisodeDropDown)
+          if(openSeasonDropDown) setSeasonDropDown(false)
+          }}>
+          <Text className="selected">{selectedEpisode}</Text>
+        </Pressable>
 
-        <DropDown showType="episode" open={dropEpisode} list={allEpisode} setSelected={setEpisode} />
-
+        <DropDown
+          open={openEpisodeDropDown}
+          list={allEpisode}
+          closeDropDown={setEpisodeDropDown}
+          setSelected={setEpisode}
+        />
       </View>
     </View>
   );

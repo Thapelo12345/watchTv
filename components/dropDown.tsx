@@ -2,49 +2,41 @@ import { View, Pressable, Text, ScrollView, FlatList, Modal } from "react-native
 import "react-native-get-random-values";
 import { v4 as uuidv4 } from "uuid";
 import { BlurView } from "expo-blur";
-import { useState, useEffect } from "react";
-import { useMainStore } from "@/stateManagement/store";
 
 type PROPS = {
-  showType: string;
   open: boolean;
   list: string[];
+  closeDropDown: (value: boolean)=> void;
   setSelected: (vlaue: string) => void;
 };
-export default function DropDown({showType, open, list, setSelected }: PROPS) {
-
-  const openSeason = useMainStore((state: any) => state.openCloseSeason),
-   openEpisode = useMainStore((state: any) => state.openCloseEpisode);
-
-  const [openDrop, setDrop] = useState(false)
-
-  useEffect(()=>{setDrop(open)}, [open])
+export default function DropDown({open, list, closeDropDown, setSelected }: PROPS) {
 
   return (
     <View className={
-      `${openDrop ? "visible max-h-60" : "hidden h-0"} absolute top-15 left-0 w-40 z-20 pb-10 transition-all duration-160`
+      `${open ? "visible max-h-60" : "hidden h-0"} absolute top-14 left-0 w-40 z-20 py-2`
     }>
       <BlurView
               className="left-0 w-full h-full"
-              intensity={50}
+              intensity={1}
               tint="dark"
             >
        <ScrollView 
         nestedScrollEnabled={true} /* Essential: Stops the parent screen from stealing your scroll track */
-        showsVerticalScrollIndicator={true}
+        showsVerticalScrollIndicator={false}
       >
       {
         list.map((item)=> (
           <Pressable
-          className="bg-blue-500 px-4 m-1 p-2 rounded-lg"
+          className="scroll-items"
           key={uuidv4()}
           onPress={()=>{
             setSelected(item)
-            showType == "season" ? openSeason(false) :
-            openEpisode(false)
+            closeDropDown(false)
           }}
           >
-            <Text>{item}</Text>
+            <Text className="text-white"
+            style={{textDecorationColor: "black", textShadowOffset: {width: 1, height: 1}, textShadowRadius: 1}}
+            >{item}</Text>
           </Pressable>
         ))
       }

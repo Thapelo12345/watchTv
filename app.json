@@ -22,7 +22,9 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [],
+      "package": "com.thapelo1.watchTv"
     },
     "web": {
       "bundler": "metro",
@@ -32,7 +34,8 @@
     "plugins": [
       "expo-router",
       "react-native-video",
-      "expo-video"
+      "expo-video",
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true

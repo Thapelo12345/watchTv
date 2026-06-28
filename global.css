@@ -4,23 +4,51 @@
  
 @import "nativewind/theme";
 
+@theme {
+  /* Define your custom font family utility class */
+  --font-lobster: "Lobster_400Regular";
+  --font-lora: "Lora_400Regular"
+}
 @layer components {
-    .pageHeaders{
-        @apply text-green-500 text-4xl text-center mb-2 mt-5;
+
+    .auth-btn{
+        @apply text-lg font-lora text-white border-2 border-white p-0.5 px-4 rounded-lg;
+    }
+    .page-containers{
+        @apply flex flex-col items-center justify-evenly;
+    }
+    .pageHeaders {
+        @apply text-white shadow-2xl shadow-black w-fit font-lobster bg-green-600 text-2xl text-center p-2 px-6 rounded-lg mb-2 mt-5;
+        box-shadow: 2px 2px 4px white, 2px 2px 4px black;
+    }
+
+    .image-loader{
+        @apply flex items-center justify-center m-2 w-full h-80;
+    }
+
+    .media-btn-container{
+        @apply flex flex-row items-start justify-evenly p-2 mx-4 px-4 border-2 border-white rounded-2xl;
+    }
+    .media-btn{
+        @apply text-white text-2xl mx-2;
     }
 
     .card{
-        @apply m-1 overflow-hidden rounded-lg;
-        box-shadow: "1px 7px 8px white, 1px 2px 5.5px black";
+        @apply bg-white m-1 w-35 overflow-hidden rounded-lg;
+        box-shadow: 1px 7px 8px white, 1px 2px 6px black;
+    }
+
+    .cast-card{
+        @apply bg-white items-center w-45 h-75 m-3 p-2 pb-10 rounded-md;
+        box-shadow: -2px -2px 5px white, -2px -2px 4px black;
     }
 
     .search-container{
-        @apply h-17 rounded-2xl flex flex-row items-center m-2 px-2 py-0;
-        box-shadow: "2px 5px 8px white, 1px 1px 4px black";
+        box-shadow: 1px 1px 1px black, 2px 2px 6px white;
     }
 
     .search-input{
-        @apply mx-2 px-2 w-[75%];
+        @apply mx-2 px-2 w-[60%];
     }
 
     .search-btn{
@@ -29,6 +57,14 @@
 
     .series-btn{
         @apply border-2 border-white p-2 px-8 text-lg m-2 rounded-lg;
+    }
+
+    .selected{
+        @apply text-white font-lora font-extrabold;
+    }
+
+    .scroll-items{
+        @apply text-white text-2xl font-lora w-fit font-extrabold bg-blue-500 p-2 m-1 rounded-lg;
     }
 
 }

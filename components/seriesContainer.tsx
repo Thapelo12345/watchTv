@@ -1,46 +1,58 @@
-import { View, Text, Image, Pressable} from "react-native"
-import { router } from 'expo-router';
-import { StarIcon } from "react-native-heroicons/solid"
+import { View, Text, Image, Pressable } from "react-native";
+import { router } from "expo-router";
+import { StarIcon } from "react-native-heroicons/solid";
 import { useMainStore } from "@/stateManagement/store";
 import { showPosition } from "@/utils/util";
 import { useEffect } from "react";
 
-type PROPS ={
-    program: any;
-    title: string;
-    seriesYear: number;
-    rate:number;
-    imageUrl: string;
-}
-export default function SeriesContainer({program, title, seriesYear, rate, imageUrl }: PROPS){
-    const setShow = useMainStore((state: any)=> state.set_selected_show)
-    const savePosition = useMainStore((state: any)=> state.getSelectedPosition)
-    
-    useEffect(()=> {savePosition(showPosition(program))}, [])
+type PROPS = {
+  program: any;
+  title: string;
+  seriesYear: number;
+  rate: number;
+  imageUrl: string;
+};
+export default function SeriesContainer({
+  program,
+  title,
+  seriesYear,
+  rate,
+  imageUrl,
+}: PROPS) {
+  const setShow = useMainStore((state: any) => state.set_selected_show);
+  const savePosition = useMainStore((state: any) => state.getSelectedPosition);
 
-    return(
+  useEffect(() => {
+    savePosition(showPosition(program));
+  }, []);
 
-        <Pressable
-            onPress={()=>{
-              setShow(program, "series")
-              router.navigate("../showInfo")
-            }}
-            >
-        <View className="card">
-            <Image
-            className="w-full h-40"
-             source={{uri: imageUrl}}
-             resizeMode="cover"
-             />
+  return (
+    <Pressable
+      onPress={() => {
+        setShow(program, "series");
+        router.navigate("../showInfo");
+      }}
+    >
+      <View className="card">
+        <Image
+          style={{ width: '100%', height: 160, backgroundColor: '#eee' }} 
+          source={{ uri: imageUrl }}
+          defaultSource={require("../assets/images/series-defualt.png")}
+          accessibilityLabel="Series image"
+          resizeMode="cover"
+        />
 
-            <View className="mx-2">
-                <Text 
-                numberOfLines={1} 
-                className="truncate">{title}</Text>
-                <Text><StarIcon color="gold" size={10} /> {rate}</Text>
-                <Text>{seriesYear}</Text>
-            </View>
+        <View className="mx-2">
+          <Text 
+          numberOfLines={1} className="font-lora font-extrabold truncate">
+            {title}
+          </Text>
+          <Text>
+            <StarIcon color="gold" size={10} /> {rate}
+          </Text>
+          <Text> {seriesYear}</Text>
         </View>
-            </Pressable>
-    )
+      </View>
+    </Pressable>
+  );
 }

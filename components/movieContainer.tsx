@@ -27,10 +27,15 @@ export default function MovieContainer({ program, title, movieYear, rate, imageU
     }}
     >
     <View className="card">
-      <Image className="w-full h-40" source={{ uri: imageUrl }} resizeMode="cover" />
+      <Image 
+      style={{ width: '100%', height: 160, backgroundColor: '#eee' }}
+      source={{ uri: imageUrl }}
+      defaultSource={require("../assets/images/movies-default.png")}
+      accessibilityLabel="Movie image"
+       resizeMode="cover" />
 
       <View className="mx-2">
-        <Text numberOfLines={1} className="truncate">
+        <Text numberOfLines={1} className="font-lora font-extrabold truncate">
           {title}
         </Text>
         <Text>

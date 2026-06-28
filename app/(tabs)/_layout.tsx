@@ -1,4 +1,5 @@
 import { Tabs } from "expo-router";
+import { TouchableOpacity } from "react-native";
 import {
   HomeIcon,
   TvIcon,
@@ -9,13 +10,13 @@ import SearchComponent from "@/components/searchComponent";
 import { useMainStore } from "@/stateManagement/store";
 import { useEffect } from "react";
 
-const iconSize = 20
 export default function TabLayout() {
   const getMovies = useMainStore((state: any) => state.getMovies);
   const getSeries = useMainStore((state: any) => state.getSeries);
-
-  const moviesUrl = "http://192.168.18.7:5000/movies",
-    seriesUrl = "http://192.168.18.7:5000/series";
+  const mainUrl = useMainStore((state: any)=> state.baseUrl)
+  
+  const moviesUrl = `${mainUrl}/movies`,
+    seriesUrl = `${mainUrl}/series`;
 
   const getShows = async (showUrl: string) => {
     try {
@@ -58,24 +59,23 @@ export default function TabLayout() {
           // main bar
           tabBarStyle: {
             backgroundColor: "white",
-            boxShadow: "1px 7px 8px white, 1px 2px 5.5px black, -1px -7px 8px white",
-            // margin: 20,
+            boxShadow: "inset 2px 2px 8px whitesmoke, inset -2px -2px 8px whitesmoke, 1px 7px 8px white, 1px 2px 5.5px black, -1px -7px 8px white,",
             borderRadius: 10,
             width: 400,
             height: 60,
-            marginBottom: 10,
-            marginHorizontal: 10,
-            // padding: 50,
+            margin: 10,
+            overflow: "hidden"
           },
 
+          tabBarActiveTintColor:"white",
+          tabBarAllowFontScaling: true,
+          
+          tabBarActiveBackgroundColor: "skyblue",
+
           tabBarItemStyle: {
-            paddingTop: -5,
-            // borderWidth: 1,
-            // borderColor: "whitesmoke",
-            // borderRadius: 20,
-            width: 10,
-            height: 50,
-            // overflow: "hidden"
+            backgroundColor: "white",
+            height: 60,
+
           },
         }}
       >
@@ -83,9 +83,24 @@ export default function TabLayout() {
           name="index"
           options={{
             title: "Home",
-            tabBarIcon: ({ color, size }) => (
-              <HomeIcon color={color} size={18} />
+            tabBarIcon: ({ color, size, focused }) => (
+              <HomeIcon color={color} size={focused ? 17 : 15} />
             ),
+
+            tabBarButton: (props: any) => (
+      <TouchableOpacity
+        {...props}
+        style={[
+          props.style, 
+          {
+            borderRadius: 50,
+            width: 60,
+            overflow: 'hidden',
+          }
+        ]}
+        activeOpacity={0.7}
+      />
+    ),
           }}
         />
 
@@ -93,9 +108,23 @@ export default function TabLayout() {
           name="series"
           options={{
             title: "Series",
-            tabBarIcon: ({ color, size }) => (
-              <TvIcon color={color} size={18} />
+            tabBarIcon: ({ color, size, focused }) => (
+              <TvIcon color={color} size={focused ? 17 : 15} />
             ),
+            tabBarButton: (props: any) => (
+      <TouchableOpacity
+        {...props}
+        style={[
+          props.style, 
+          {
+            borderRadius: 50,
+            width: 60,
+            overflow: 'hidden',
+          }
+        ]}
+        activeOpacity={0.7}
+      />
+    ),
           }}
         />
 
@@ -103,9 +132,23 @@ export default function TabLayout() {
           name="movies"
           options={{
             title: "Movies",
-            tabBarIcon: ({ color, size }) => (
-              <FilmIcon color={color} size={18} />
+            tabBarIcon: ({ color, size, focused }) => (
+              <FilmIcon color={color} size={focused ? 17 : 15} />
             ),
+            tabBarButton: (props: any) => (
+      <TouchableOpacity
+        {...props}
+        style={[
+          props.style, 
+          {
+            borderRadius: 50,
+            width: 60,
+            overflow: 'hidden',
+          }
+        ]}
+        activeOpacity={0.7}
+      />
+    ),
           }}
         />
 
@@ -113,9 +156,23 @@ export default function TabLayout() {
           name="settings"
           options={{
             title: "Settings",
-            tabBarIcon: ({ color, size }) => (
-              <Cog6ToothIcon color={color} size={18} />
+            tabBarIcon: ({ color, size, focused }) => (
+              <Cog6ToothIcon color={color} size={focused ? 17 : 15} />
             ),
+            tabBarButton: (props: any) => (
+      <TouchableOpacity
+        {...props}
+        style={[
+          props.style, 
+          {
+            borderRadius: 50,
+            width: 60,
+            overflow: 'hidden',
+          }
+        ]}
+        activeOpacity={0.7}
+      />
+    ),
           }}
         />
       </Tabs>
