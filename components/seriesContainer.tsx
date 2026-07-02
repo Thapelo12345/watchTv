@@ -1,4 +1,5 @@
-import { View, Text, Image, Pressable } from "react-native";
+import { View, Text, Pressable } from "react-native";
+import { Image } from 'expo-image';
 import { router } from "expo-router";
 import { StarIcon } from "react-native-heroicons/solid";
 import { useMainStore } from "@/stateManagement/store";
@@ -12,6 +13,8 @@ type PROPS = {
   rate: number;
   imageUrl: string;
 };
+
+
 export default function SeriesContainer({
   program,
   title,
@@ -37,9 +40,10 @@ export default function SeriesContainer({
         <Image
           style={{ width: '100%', height: 160, backgroundColor: '#eee' }} 
           source={{ uri: imageUrl }}
-          defaultSource={require("../assets/images/series-defualt.png")}
+          placeholder={require("../assets/images/series-defualt.png")}
           accessibilityLabel="Series image"
-          resizeMode="cover"
+          transition={200}
+          contentFit="cover"
         />
 
         <View className="mx-2">

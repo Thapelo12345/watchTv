@@ -1,10 +1,10 @@
 import {
   View,
   Text,
-  ImageBackground,
   ScrollView,
   Pressable,
 } from "react-native";
+import { ImageBackground } from 'expo-image';
 import "react-native-get-random-values";
 import { v4 as uuidv4 } from "uuid";
 import { BlurView } from "expo-blur";
@@ -14,7 +14,7 @@ import { router } from "expo-router";
 import CastCard from "@/components/castCard";
 import { Alert, ActivityIndicator } from "react-native";
 import { useNavigation } from "expo-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMainStore } from "@/stateManagement/store";
 
 export default function Infor() {
@@ -22,22 +22,25 @@ export default function Infor() {
 
   const turnOnPlay = useMainStore((state: any) => state.setPlaying);
 
-  const mainUrl = useMainStore((state: any)=> state.baseUrl)
-  // const seasonOpen = useMainStore((state: any) => state.openSeason),
-  //   episodeOpen = useMainStore((state: any) => state.openEpisode);
+  const mainUrl = useMainStore((state: any) => state.baseUrl);
+  const selected_show = useMainStore((state: any) => state.selectedShow);
 
   const [season, setSeason] = useState("Season 1");
   const [episode, setEpisode] = useState("Episode 1");
+  const [showHeader, setShowHeader] = useState(selected_show.seriesHeader)
+  const [AddingSeasonOnline, setAddingSeason] = useState(false)
   const [playLoader, setPlayLoader] = useState(false);
+  const [showLanguage, setShowLanguage] = useState("Not specified!.")
 
-  const selected_show = useMainStore((state: any) => state.selectedShow);
   const positionedAt = useMainStore((state: any) => state.selectedPosition);
+
+  const typeOfShow = useMainStore((state: any) => state.showType);
+  const pendingSeasons = typeOfShow == "series" ? selected_show.pendingSeasons.length !== 0 : false
 
   // updating movies or series array
   const editMovies = useMainStore((state: any) => state.editMovies);
   const editSeries = useMainStore((state: any) => state.editSeries);
 
-  const typeOfShow = useMainStore((state: any) => state.showType);
   const setPlayingUrl = useMainStore((state: any) => state.setUrl);
 
   const genres =
@@ -49,6 +52,20 @@ export default function Infor() {
     typeOfShow === "series"
       ? selected_show.seriesCast
       : selected_show.movieCast;
+
+    useEffect(()=>{
+      console.log("This is the header:", selected_show.seriesHeader)
+      setShowHeader(selected_show.seriesHeader)
+
+      const mainLanguage = typeOfShow == "series"
+      ? selected_show.seriesLanguage
+      : selected_show.movieLanguage
+
+      if(mainLanguage[0] === "$" || mainLanguage === "" || !mainLanguage) setShowLanguage("NOT SPECIFIED")
+      else setShowLanguage(mainLanguage)
+
+
+    }, [selected_show])
 
   return (
     <View className="w-screen h-screen">
@@ -62,24 +79,21 @@ export default function Infor() {
         <View>
           <ImageBackground
             className="items-center h-170 w-full relative"
-            source={{
-              uri:
-                typeOfShow == "series"
-                  ? selected_show.seriesImageUrl
-                  : selected_show.movieImageUrl,
-            }}
-            resizeMode="cover"
+            source={{uri: typeOfShow == "series" ? selected_show.seriesImageUrl: selected_show.movieImageUrl}}
+            transition={200} // Fast-fade transition will now work perfectly here!
+            contentFit="cover" // Equivalent to resizeMode
           >
             {/* play button container */}
-            <View className="my-[50%] shadow-2xl rounded-full">
+            <View className="m-[50%]  shadow-2xl rounded-full">
               {!playLoader ? (
                 <Pressable
                   onPress={async () => {
+                    if(AddingSeasonOnline) return
+
                     setPlayLoader(true);
                     if (typeOfShow !== "series") {
                       let currentUrl = selected_show.playingUrl;
 
-                      console.log(currentUrl);
                       if (!currentUrl) {
                         const response = await fetch(
                           `${mainUrl}/update-movie`,
@@ -184,7 +198,7 @@ export default function Infor() {
             </View>
 
             <BlurView
-              className="absolute bottom-0 left-0 w-full h-40"
+              className={`flex justify-evenly absolute bottom-0 left-0 w-full ${typeOfShow == "series"? "h-60" :"h-30"}`}
               intensity={90}
               tint="dark"
             >
@@ -192,20 +206,17 @@ export default function Infor() {
 
               <View className="flex flex-row">
                 <Text className="text-white font-lora text-2xl">Langauge:</Text>
-                  <Text className="bg-green-500 text-2xl text-white mx-4 p-1 font-lora px-4 font-extrabold rounded-lg">
-                    {typeOfShow == "series"
-                      ? selected_show.seriesLanguage
-                      : selected_show.movieLanguage}
+                <Text className="bg-green-500 text-2xl text-white mx-4 p-1 font-lora px-4 font-extrabold rounded-lg truncate">
+                  {showLanguage}
                 </Text>
               </View>
 
               {/* Genres section */}
               <View className="flex flex-row w-full">
                 <Text className="text-white font-lora text-lg">Genres:</Text>
-                {genres.map((genre: any) => (
-                  <Text className="text-white text-lg" key={uuidv4()}>
-                    {" "}
-                    {genre},{" "}
+                {genres.map((genre: string) => (
+                  <Text className="text-white text-lg" key={genre}>
+                    {" "}{genre},{" "}
                   </Text>
                 ))}
               </View>
@@ -214,9 +225,13 @@ export default function Infor() {
               <View>
                 {typeOfShow == "series" && (
                   <SelectComponent
+                    showTitle={showHeader}
                     selectedSeason={season}
                     selectedEpisode={episode}
                     seasonsEpisode={selected_show.seriesSeasons}
+                    pendingSeasons={pendingSeasons}
+                    addingSeaon={AddingSeasonOnline}
+                    setaddingSeason={setAddingSeason}
                     setSeason={setSeason}
                     setEpisode={setEpisode}
                   />
@@ -226,7 +241,9 @@ export default function Infor() {
           </ImageBackground>
         </View>
 
-        <Text className="text-4xl text-green-600 underline underline-offset-2 font-lobster text-center">Description</Text>
+        <Text className="text-4xl text-green-600 underline underline-offset-2 font-lobster text-center">
+          Description
+        </Text>
         <Text className="p-2 text-base font-lora text-center leading-relaxed">
           {typeOfShow == "series"
             ? selected_show.seriesDescription
@@ -234,9 +251,7 @@ export default function Infor() {
         </Text>
 
         {/* Cast items here */}
-        <Text
-          className="text-center font-lobster text-green-500 text-4xl m-2"
-        >
+        <Text className="text-center font-lobster text-green-500 text-4xl m-2">
           Cast
         </Text>
         <View className="w-full mb-15 flex flex-row flex-wrap items-start justify-evenly">

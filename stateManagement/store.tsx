@@ -8,17 +8,20 @@ type STORETYPES ={
   selectedPosition: number;
   showType: string;
   playUrl: string;
-  playing: string;
+  playing: boolean;
   searchResults: any[],
   searching: boolean;
   onlineSearch: boolean;
+  userStatus: string;
   getMovies: (value: any)=> void;
   addMovie: (value: any)=> void;
   editMovies:(pos: number, newObj: any)=> void;//replacing one value from the array tv programme
   getSeries: (value: any)=> void;
   addSeries: (value: any)=> void;
+  addSeasonToSeries:(title: string, newSeason: any)=> void;
   editSeries: (pos: number, newObj: any) => void;//replacing one value from the array tv programme
   set_selected_show: (value: any)=> void;
+  addSeasonToSelected: (title: string, newSeason: any)=> void;
   setUrl: (value: string)=> void;
   setPlaying: (value: boolean)=> void;
   getSelectedPosition: (value: number)=> void;
@@ -41,6 +44,7 @@ export const useMainStore = create((set)=>({
     searchResults: [],
     searching: false,
     onlineSearch: false,
+    userStatus: "guest",
   getMovies: (newMovie: any)=> set({movies: newMovie}),
   addMovie: (newMovie: any)=> set((state: any)=> ({movies: [...state.movies, newMovie]})),
   editMovies: (position: number, newTvProgramme: any)=> set((state: any) => {
@@ -56,7 +60,25 @@ export const useMainStore = create((set)=>({
       updateSeries[position] = newTvProgramme; // 2. Modify index
       return { series: updateSeries };       // 3. Return update
     }),
+    addSeasonToSeries: (title: string, newSeason: any) => set((state: any) => ({
+  series: state.series.map((show: any) => {
+    if (show.seriesHeader !== title) return show;
+
+    return {
+      ...show,
+      seriesSeasons: [...show.seriesSeasons, newSeason],
+      pendingSeasons: show.pendingSeasons.slice(1) // Removes the first item safely
+    };
+  })
+})),
   set_selected_show: (newShow: any, type_of_show: string)=> set({selectedShow: newShow, showType: type_of_show}),
+  addSeasonToSelected: (newSeason: any) => set((state: any)=>({
+    selectedShow:{
+      ...state.selectedShow,
+      seriesSeasons: [...state.selectedShow.seriesSeasons, newSeason],
+      pendingSeasons: state.selectedShow.pendingSeasons.slice(1)
+    }
+  })),
   getSelectedPosition: (newPosistion: number)=> set({selectedPosition: newPosistion}),
   setUrl: (newUrl: string)=> set({playUrl: newUrl}),
   setPlaying: (position: boolean)=> set({playing: position}),
@@ -64,6 +86,7 @@ export const useMainStore = create((set)=>({
   setOnlineSearch: ()=> set((state: any)=> ({onlineSearch: !state.onlineSearch})),
   addSearchResults: (newResults: any)=> set((state:any)=> ({searchResults: [...state.searchResults, newResults]})),
   removeSearchResults: (oldResults: any)=> set((state: any)=>({searchResults: state.searchResults.filter((item: any)=> item._id !== oldResults._id)})),
-  clearSearchResults: ()=> set({searchResults: []})
+  clearSearchResults: ()=> set({searchResults: []}),
+  setUserStatus: (newStatus: string)=> set({userStatus: newStatus}),
 
 }))

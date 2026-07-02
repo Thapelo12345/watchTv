@@ -19,7 +19,8 @@ export function showPosition(tvProgramme: any) {
     : currentMovies.indexOf(tvProgramme);
 }
 
-export function search(characters: string, showType: string) {
+export async  function search(characters: string, showType: string) {
+
   const currentMovies = (useMainStore.getState() as { movies: any }).movies;
   const currentSeries = (useMainStore.getState() as { series: any }).series;
 
@@ -28,16 +29,16 @@ export function search(characters: string, showType: string) {
 
   if (characters === "" && searchOn) {
     emptyResults();
-    switchSearch();
+    switchSearch();// here i am turning of searching mode because the user has cleared the search input, so we don't need to search anymore
     return;
-  } else if (characters !== "" && !searchOn) switchSearch();
+  } else if (characters !== "" && !searchOn) switchSearch();//here i am turning on searching mode because the user has entered some characters in the search input, so we need to search for matching shows
 
-  const enteredText = characters.toLocaleLowerCase();
+  const enteredText = characters.trim().toLowerCase();
   const showArray = showType === "series" ? currentSeries : currentMovies;
 
   for (const show of showArray) {
-    const selectedText =
-      showType === "series" ? show.seriesHeader : show.movieHeader;
+    const selectedText = showType === "series" ? show.seriesHeader : show.movieHeader;
+
     if (!selectedText) {
       console.error(`This is the value of selected text: ${selectedText}`);
       break;

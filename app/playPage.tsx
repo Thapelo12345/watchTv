@@ -12,8 +12,6 @@ export default function PlayComponent() {
   const playableUrl = useMainStore((state: any) => state.playUrl);
   const turnOffPlay = useMainStore((state: any) => state.setPlaying);
 
-  // Intercepts navigation requests
-//   const handleShouldStartLoad = (request: WebViewNavigation) => {return request.url === playableUrl};
 
   useEffect(() => {
     const backHandler = BackHandler.addEventListener(

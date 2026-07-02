@@ -43,6 +43,7 @@ export default function Home() {
         </View>
         
       ) : (
+
         <MarqeeComponent
           linkText="Series"
           urlLink="/(tabs)/series"

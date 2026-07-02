@@ -1,4 +1,5 @@
-import { Text, View, Image, Pressable } from "react-native";
+import { Text, View, Pressable } from "react-native";
+import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { StarIcon } from "react-native-heroicons/solid";
 import { useMainStore } from "@/stateManagement/store";
@@ -14,6 +15,7 @@ type PROPS = {
 };
 
 export default function MovieContainer({ program, title, movieYear, rate, imageUrl }: PROPS) {
+
   const setShow = useMainStore((state: any)=> state.set_selected_show)
   const savePosition = useMainStore((state: any)=> state.getSelectedPosition)
 
@@ -30,9 +32,10 @@ export default function MovieContainer({ program, title, movieYear, rate, imageU
       <Image 
       style={{ width: '100%', height: 160, backgroundColor: '#eee' }}
       source={{ uri: imageUrl }}
-      defaultSource={require("../assets/images/movies-default.png")}
+      placeholder={require("../assets/images/movies-default.png")} 
       accessibilityLabel="Movie image"
-       resizeMode="cover" />
+      transition={200}
+       contentFit="cover" />
 
       <View className="mx-2">
         <Text numberOfLines={1} className="font-lora font-extrabold truncate">

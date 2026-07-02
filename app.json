@@ -39,6 +39,13 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "7ef6bbc2-b19a-4d28-95a2-348898a00bca"
+      }
+    },
+    "owner": "thapelo1"
   }
 }

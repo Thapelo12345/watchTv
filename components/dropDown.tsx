@@ -28,7 +28,7 @@ export default function DropDown({open, list, closeDropDown, setSelected }: PROP
         list.map((item)=> (
           <Pressable
           className="scroll-items"
-          key={uuidv4()}
+          key={item}
           onPress={()=>{
             setSelected(item)
             closeDropDown(false)

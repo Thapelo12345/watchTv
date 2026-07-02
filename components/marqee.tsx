@@ -28,10 +28,10 @@ export default function MarqeeComponent({
 <View pointerEvents="none">
       <Marquee spacing={10} speed={direction} direction="horizontal">
         <View className="flex flex-row mb-10">
-          {imagesArray.map((imageUrl) => (
+          {imagesArray.map((imageUrl, index) => (
             <Image
-              className="flex flex-row m-1 w-40 h-70 rounded-lg"
-              key={imageUrl.id}
+              key={index}
+              className="flex flex-row m-1 w-40 h-72 rounded-lg"
               source={{ uri: imageUrl.imageUrl }}
             />
           ))}
