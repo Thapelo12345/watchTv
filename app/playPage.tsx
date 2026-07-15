@@ -12,12 +12,10 @@ export default function PlayComponent() {
   const playableUrl = useMainStore((state: any) => state.playUrl);
   const turnOffPlay = useMainStore((state: any) => state.setPlaying);
 
-
   useEffect(() => {
     const backHandler = BackHandler.addEventListener(
       "hardwareBackPress",
-      function () {
-        turnOffPlay(false);
+      function () {turnOffPlay(false);
       },
     );
 
@@ -49,6 +47,13 @@ export default function PlayComponent() {
         source={{ uri: playableUrl }}
         style={{ width: "100%", height: "100%" }}
         onShouldStartLoadWithRequest={(request: WebViewNavigation) => {return request.url === playableUrl}}
+        // this alow adds, it was working before this below code 
+        // domStorageEnabled={true}
+        // javaScriptEnabled={true}
+        // originWhitelist={['*']}
+        // allowsInlineMediaPlayback={true}
+        // mediaPlaybackRequiresUserAction={false} 
+        // allowed adds above
         setSupportMultipleWindows={false}
         onHttpError={(syntheticEvent) => {
         const { nativeEvent } = syntheticEvent;

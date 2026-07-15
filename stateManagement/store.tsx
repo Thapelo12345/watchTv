@@ -4,7 +4,7 @@ type STORETYPES ={
   baseUrl: string;
   movies: any[],
   series: any[];
-  selectedShow: any;
+  selectedShow: {programme: any, programmeType:string};
   selectedPosition: number;
   showType: string;
   playUrl: string;
@@ -12,7 +12,8 @@ type STORETYPES ={
   searchResults: any[],
   searching: boolean;
   onlineSearch: boolean;
-  userStatus: string;
+  isAuthOpen: boolean;
+  appLoading: boolean;
   getMovies: (value: any)=> void;
   addMovie: (value: any)=> void;
   editMovies:(pos: number, newObj: any)=> void;//replacing one value from the array tv programme
@@ -20,7 +21,7 @@ type STORETYPES ={
   addSeries: (value: any)=> void;
   addSeasonToSeries:(title: string, newSeason: any)=> void;
   editSeries: (pos: number, newObj: any) => void;//replacing one value from the array tv programme
-  set_selected_show: (value: any)=> void;
+  set_selected_show: (value1: any, value2: string)=> void;
   addSeasonToSelected: (title: string, newSeason: any)=> void;
   setUrl: (value: string)=> void;
   setPlaying: (value: boolean)=> void;
@@ -30,13 +31,16 @@ type STORETYPES ={
   clearSearchResults: ()=> void;
   setSearching: ()=> void,
   setOnlineSearch: ()=> void,
+  setIsAuthOpen: (value: boolean)=> void;
+  switchAppLoding:()=> void,
+
 }
 
 export const useMainStore = create((set)=>({
-  baseUrl: "http://192.168.18.7:5000",
+  baseUrl: "http://192.168.18.7:3000",
     movies: [],
     series: [],
-    selectedShow: null,
+    selectedShow: {programme: null, programmeType: null},
     selectedPosition: -1,
     showType: "series",
     playUrl: null,
@@ -44,7 +48,8 @@ export const useMainStore = create((set)=>({
     searchResults: [],
     searching: false,
     onlineSearch: false,
-    userStatus: "guest",
+    isAuthOpen: false,
+    appLoading: false,
   getMovies: (newMovie: any)=> set({movies: newMovie}),
   addMovie: (newMovie: any)=> set((state: any)=> ({movies: [...state.movies, newMovie]})),
   editMovies: (position: number, newTvProgramme: any)=> set((state: any) => {
@@ -61,7 +66,7 @@ export const useMainStore = create((set)=>({
       return { series: updateSeries };       // 3. Return update
     }),
     addSeasonToSeries: (title: string, newSeason: any) => set((state: any) => ({
-  series: state.series.map((show: any) => {
+    series: state.series.map((show: any) => {
     if (show.seriesHeader !== title) return show;
 
     return {
@@ -71,7 +76,13 @@ export const useMainStore = create((set)=>({
     };
   })
 })),
-  set_selected_show: (newShow: any, type_of_show: string)=> set({selectedShow: newShow, showType: type_of_show}),
+  set_selected_show: (newShow: any, type_of_show: string) => 
+  set((state: any) => ({ 
+    selectedShow: { 
+      programme: newShow, 
+      programmeType: type_of_show 
+    } 
+  })),
   addSeasonToSelected: (newSeason: any) => set((state: any)=>({
     selectedShow:{
       ...state.selectedShow,
@@ -88,5 +99,6 @@ export const useMainStore = create((set)=>({
   removeSearchResults: (oldResults: any)=> set((state: any)=>({searchResults: state.searchResults.filter((item: any)=> item._id !== oldResults._id)})),
   clearSearchResults: ()=> set({searchResults: []}),
   setUserStatus: (newStatus: string)=> set({userStatus: newStatus}),
-
+  setIsAuthOpen: (newStatus: boolean)=> set({isAuthOpen: newStatus}),
+  switchAppLoding:()=> set((state: any)=> ({appLoading: !state.appLoading})),
 }))

@@ -5,9 +5,14 @@
 @import "nativewind/theme";
 
 @theme {
+
+    /* Define Theme colors */
+    --backgraound: "#FFFDD0";
+    --foreground: "#FFFFFF";
+    
   /* Define your custom font family utility class */
-  --font-lobster: "Lobster_400Regular";
-  --font-lora: "Lora_400Regular"
+    --font-lobster: "Lobster_400Regular";
+    --font-lora: "Lora_400Regular"
 }
 @layer components {
 
@@ -16,7 +21,9 @@
     }
 
     .form-btn{
-        @apply border p-2 px-4 m-2 mx-4 text-lg rounded-lg;
+        @apply border border-white p-2 px-4 m-2 mx-4 text-lg rounded-lg bg-blue-300 text-white;
+        box-shadow: inset 2px 2px 3px white, 1px 1px 2px black;
+        text-shadow: 1px 1px 2px black;
     }
     .page-containers{
         @apply flex flex-col items-center justify-evenly;
@@ -24,6 +31,15 @@
     .pageHeaders {
         @apply text-white shadow-2xl shadow-black w-fit font-lobster bg-green-600 text-2xl text-center p-2 px-6 rounded-lg mb-2 mt-5;
         box-shadow: 2px 2px 4px white, 2px 2px 4px black;
+    }
+
+    .input-text {
+        @apply flex-1 border-2 text-white  border-white bg-blue-300  m-1 p-2 truncate h-fit rounded-lg overflow-hidden ;
+        box-shadow: inset 1px 2px 5px black, 1px 1px 4px white, 1px 1px 4px black;
+    }
+    
+    .image-shadow{
+        box-shadow: inset 1px 2px 5px black, 1px 1px 4px white, 1px 1px 4px black;
     }
 
     .image-loader{
@@ -34,7 +50,8 @@
         @apply flex flex-row items-start justify-evenly p-2 mx-4 px-4 border-2 border-white rounded-2xl;
     }
     .media-btn{
-        @apply text-white text-2xl mx-2;
+        @apply text-white text-2xl bg-black/50 mx-2;
+        text-shadow: 1px 1px 3px black;
     }
 
     .card{
@@ -43,7 +60,7 @@
     }
 
     .cast-card{
-        @apply bg-white items-center w-45 h-75 m-3 p-2 pb-10 rounded-md;
+        @apply bg-[--foreground] items-center w-45 h-75 m-3 p-2 pb-10 rounded-md;
         box-shadow: -2px -2px 5px white, -2px -2px 4px black;
     }
 
@@ -68,7 +85,8 @@
     }
 
     .scroll-items{
-        @apply text-white text-2xl font-lora w-fit font-extrabold bg-blue-500 p-2 m-1 rounded-lg;
+     @apply text-white text-2xl font-lora w-fit font-extrabold bg-blue-500 p-2 m-1 rounded-lg;
     }
+   
 
 }

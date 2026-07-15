@@ -1,4 +1,4 @@
-import { View, Text, FlatList } from "react-native"
+import { View, Text, FlatList, ActivityIndicator } from "react-native"
 import React from "react";
 import MovieContainer from "@/components/movieContainer"
 import { useMainStore } from "@/stateManagement/store";
@@ -22,7 +22,6 @@ const MovieItem = React.memo(({ item }: { item: any }) => {
   );
 });
 
-
 export default function Movies(){
 
   const renderItem = React.useCallback(({ item }: any) => (
@@ -30,6 +29,7 @@ export default function Movies(){
   ), []);
   
   const movies = useMainStore((state: any)=> state.movies)
+  const onlineSearchOn = useMainStore((state: any)=> state.onlineSearch)
 
   const switchSearch = useMainStore((state: any)=> state.setSearching)
   const searchOn = useMainStore((state: any)=> state.searching)
@@ -47,7 +47,11 @@ export default function Movies(){
         className="pageHeaders"
         >Movies</Text>
 
-        <FlatList 
+{
+  onlineSearchOn ?
+         (<OnlineLoader />) :
+         (
+          <FlatList 
             key={3}
             contentContainerClassName="pb-20"
             numColumns={3}
@@ -59,6 +63,9 @@ export default function Movies(){
             renderItem={renderItem}
             keyExtractor={item => item._id}
             />
+         )
+}
+        
     </View>
 )
 }

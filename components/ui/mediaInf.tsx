@@ -37,7 +37,6 @@ export default function MediaInfo({ showHeader, genres, show }: PROPS) {
         <Pressable
           onPress={() => {
             const showType = !show.seriesHeader ? "movie" : "series"
-
             setShow(show, showType);
             router.navigate("../showInfo");
           }}

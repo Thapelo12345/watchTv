@@ -1,97 +1,80 @@
-import { View, ImageBackground, ActivityIndicator } from "react-native";
+import { View, ActivityIndicator } from "react-native";
+import { Image } from "expo-image";
 import { useMainStore } from "@/stateManagement/store";
 import { useEffect, useState, useRef } from "react";
 import MediaInfo from "./ui/mediaInf";
-
-type DISPLAY = {
-  header: string;
-  year: string;
-  genres: string[];
-  imageUrl: string;
-}
 
 export default function MediaScreen() {
   const movies = useMainStore((state: any) => state.movies);
   const series = useMainStore((state: any) => state.series);
 
-  const [oldShow, setOldShow] = useState<DISPLAY | null>(null);
-  const [newShow, setNewShow] = useState<DISPLAY | null>(null);
-  const [submitShow , setSubmitShow] = useState({})
+  const allProgramms: any = useRef([]);
+  const [newShow, setNewShow] = useState(null);
 
-  const [showsRecieved, setShowRecieved] = useState(false);
-  // false = showing old show on screen, true = currently preloading next show
-  const [isPreloading, setIsPreloading] = useState(false);
+  const gettingImage = (programme: any) =>
+    programme.movieImageUrl
+      ? programme.movieImageUrl
+      : programme.seriesImageUrl;
+  const gettingHeader = (programme: any) =>
+    programme.seriesHeader ? programme.seriesHeader : programme.movieHeader;
+  const gettingGenres = (programme: any) =>
+    programme.seriesGenres ? programme.seriesGenres : programme.movieGenres;
 
-  // Keep a mutable tracking ref to avoid React stale closure bugs inside the interval
-  const isReadyToChange = useRef(true);
-
-  function settingDisplay(allShow: any) {
-    const showToDisplay = allShow[Math.floor(Math.random() * allShow.length)];
-    setSubmitShow(showToDisplay)
-    return {
-      header: showToDisplay.movieHeader || showToDisplay.seriesHeader,
-      year: showToDisplay.movieYear || showToDisplay.seriesYear,
-      genres: showToDisplay.movieGenres || showToDisplay.seriesGenres,
-      imageUrl: showToDisplay.movieImageUrl || showToDisplay.seriesImageUrl,
-    };
-  }
+  async function downloadingImages(programmes: any) {
+    const allImageUrls = programmes.map((programme: any) =>
+      !programme.seriesImageUrl
+        ? programme.movieImageUrl
+        : programme.seriesImageUrl,
+    );
+    try {
+      await Image.prefetch(allImageUrls);
+    } catch (err: unknown) {
+      console.log(
+        err instanceof Error ? err.message : "Unkown image url's error!.",
+      );
+    }
+  } //end of downloading images function
 
   useEffect(() => {
     if (movies.length !== 0 && series.length !== 0) {
-      const combineShows = [...movies, ...series];
-      
-      // Set initial show right away
-      const initial = settingDisplay(combineShows);
-      setOldShow(initial);
-      setSubmitShow(initial)
-      setShowRecieved(true);
+      // reserting the array so i dont have duplicates
+      allProgramms.current = [...movies, ...series];
+      downloadingImages(allProgramms.current);
 
-      const delay = setInterval(() => {
-        // Use the mutable ref to check if the last background image finished downloading
-        if (isReadyToChange.current) {
-          const nextSelected = settingDisplay(combineShows);
-          
-          setNewShow(nextSelected);
-          setIsPreloading(true);
-          isReadyToChange.current = false; // Block next updates until this image loads
-        }
-      }, 7000);
+      const slideCounter = setInterval(() => {
+        const randomNumber =
+          Math.floor(Math.random() * allProgramms.current.length) + 1;
+        setNewShow(allProgramms.current[randomNumber]);
+      }, 7500);
 
-      return () => clearInterval(delay);
+      return () => clearInterval(slideCounter);
     }
   }, [movies, series]);
 
   return (
-    <View className="relative w-full h-95">
-      {!showsRecieved || !oldShow ? (
-        <ActivityIndicator className="m-auto" color="blue" size="large" />
+    <View className="flex-1 items-center justify-center relative w-full h-115 -z-20 overflow-hidden">
+      {!newShow ? (
+        <ActivityIndicator size="large" color="royalblue" />
       ) : (
-        <View style={{ width: "100%", height: "100%" }}>
-          
-          {/* THE MAIN VISIBLE SCREEN (Always shows the last fully downloaded show) */}
-          <ImageBackground
-            style={{ width: "100%", height: "100%" }}
-            source={{ uri: oldShow.imageUrl }}
-            defaultSource={require("../assets/images/icon.png")}
-            accessibilityLabel="Official poster for the show"
-            resizeMode="cover"
-          >
-            <MediaInfo showHeader={oldShow.header ?? ""} genres={oldShow.genres} show={submitShow}/>
-          </ImageBackground>
+        <Image
+          className="absolute inset-0 bg-red-400"
+          style={{ width: 425, height: 400 }}
+          source={{ uri: gettingImage(newShow) }}
+          accessibilityLabel="Current Show  image"
+          transition={550}
+          contentFit="fill"
+          cachePolicy="disk"
+        />
+      )}
 
-          {/* THE HIDDEN PRELOADER (Downloads the incoming new image silently behind the scenes) */}
-          {isPreloading && newShow && (
-            <ImageBackground
-              source={{ uri: newShow.imageUrl }}
-              style={{ width: 0, height: 0, position: "absolute" }}
-              onLoadEnd={() => {
-                setOldShow(newShow);            // Pull downloaded image to main display
-                setIsPreloading(false);         // Stop preloading
-                isReadyToChange.current = true; // Unlock the interval for the next cycle
-              }}
-            />
-          )}
-        </View>
+      {!newShow ? (
+        <ActivityIndicator size="large" color="royalblue" />
+      ) : (
+        <MediaInfo
+          showHeader={gettingHeader(newShow)}
+          genres={gettingGenres(newShow)}
+          show={newShow}
+        />
       )}
     </View>
   );

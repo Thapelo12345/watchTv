@@ -20,7 +20,7 @@ const SeriesItem = React.memo(({ item }: { item: any }) => {
       imageUrl={item.seriesImageUrl}
   />
 
-          </View>
+</View>
   );
 });
 

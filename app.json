@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "watchTv",
-    "slug": "watchTv",
+    "slug": "watchtv",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -14,7 +14,11 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.thapelo1.watchTv",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -35,7 +39,11 @@
       "expo-router",
       "react-native-video",
       "expo-video",
-      "expo-font"
+      "expo-font",
+      "@clerk/expo",
+      "expo-secure-store",
+      "expo-build-properties",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true
@@ -43,9 +51,15 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "7ef6bbc2-b19a-4d28-95a2-348898a00bca"
+        "projectId": "2629bd8f-6468-4cf7-baeb-2849b9bea92f"
       }
     },
-    "owner": "thapelo1"
+    "owner": "thapelo1",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/2629bd8f-6468-4cf7-baeb-2849b9bea92f"
+    }
   }
 }

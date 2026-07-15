@@ -1,9 +1,9 @@
 import { View, Text, Pressable } from "react-native";
-import { Image } from 'expo-image';
+import { Image } from "expo-image";
 import { router } from "expo-router";
 import { StarIcon } from "react-native-heroicons/solid";
 import { useMainStore } from "@/stateManagement/store";
-import { showPosition } from "@/utils/util";
+import { showPosition } from "@/utils/search-utils";
 import { useEffect } from "react";
 
 type PROPS = {
@@ -13,7 +13,6 @@ type PROPS = {
   rate: number;
   imageUrl: string;
 };
-
 
 export default function SeriesContainer({
   program,
@@ -38,7 +37,7 @@ export default function SeriesContainer({
     >
       <View className="card">
         <Image
-          style={{ width: '100%', height: 160, backgroundColor: '#eee' }} 
+          style={{ width: "100%", height: 160, backgroundColor: "#eee" }}
           source={{ uri: imageUrl }}
           placeholder={require("../assets/images/series-defualt.png")}
           accessibilityLabel="Series image"
@@ -47,8 +46,7 @@ export default function SeriesContainer({
         />
 
         <View className="mx-2">
-          <Text 
-          numberOfLines={1} className="font-lora font-extrabold truncate">
+          <Text numberOfLines={1} className="font-lora font-extrabold truncate">
             {title}
           </Text>
           <Text>

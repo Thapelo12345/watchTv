@@ -1,6 +1,8 @@
-import { View, Text, Image } from "react-native";
+import { View, Text, ActivityIndicator} from "react-native";
+import { Image } from "expo-image"
 import { Link, Href } from "expo-router";
 import { Marquee } from "@animatereactnative/marquee";
+import { useState } from "react";
 
 type PROP = {
   linkText: string;
@@ -15,6 +17,9 @@ export default function MarqeeComponent({
   direction,
   imagesArray,
 }: PROP) {
+
+  const [imageLoader, setImageLoader] = useState(true)
+  
   return (
     <View className="my-2 w-full">
       <Link 
@@ -27,11 +32,12 @@ export default function MarqeeComponent({
 
 <View pointerEvents="none">
       <Marquee spacing={10} speed={direction} direction="horizontal">
-        <View className="flex flex-row mb-10">
+        <View className="border2 border-red-500 flex flex-row mb-10">
           {imagesArray.map((imageUrl, index) => (
             <Image
               key={index}
-              className="flex flex-row m-1 w-40 h-72 rounded-lg"
+              cachePolicy="memory"
+              style={{ width: 150, height: 300, borderRadius: 10, marginHorizontal: 5 }}
               source={{ uri: imageUrl.imageUrl }}
             />
           ))}

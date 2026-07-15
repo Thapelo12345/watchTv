@@ -10,18 +10,21 @@ import SearchComponent from "@/components/searchComponent";
 import { useMainStore } from "@/stateManagement/store";
 import { useEffect } from "react";
 
+
 export default function TabLayout() {
   const getMovies = useMainStore((state: any) => state.getMovies);
   const getSeries = useMainStore((state: any) => state.getSeries);
   const mainUrl = useMainStore((state: any)=> state.baseUrl)
   
-  const moviesUrl = `${mainUrl}/movies`,
-    seriesUrl = `${mainUrl}/series`;
+  const moviesUrl = `${mainUrl}/movies/programs`,
+    seriesUrl = `${mainUrl}/series/programs`;
 
   const getShows = async (showUrl: string) => {
     try {
       const response = await fetch(showUrl, { method: "GET" });
 
+      if(!response.ok) throw new Error("Failed to retch server!..")
+        
       if (response.status !== 200) {
         alert("Failed to get data from server!.");
         return [];
@@ -30,11 +33,14 @@ export default function TabLayout() {
       // 2. FIXED: Added 'await' before response.json()
       const showData: any = await response.json();
       return showData.data;
-    } catch (error) {
-      console.error("Network Fetch Error: ", error);
+    } catch (err: unknown ) {
+      const errMessage = err instanceof Error ? err.message : "unknown server error!.."
+      console.error("Network Fetch Error: ", errMessage);
       return [];
     }
   }; //end of fetching show
+
+  
 
   useEffect(() => {
     const loadData = async () => {
