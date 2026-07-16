@@ -6,10 +6,7 @@ import { useMainStore } from "@/stateManagement/store";
 import { userStore } from "@/stateManagement/userStore";
 import { extractUserInfo } from "@/utils/form-utils";
 import { View, ActivityIndicator, Modal, Text } from "react-native";
-// import * as WebBrowser from "expo-web-browser";
 import AuthForm from "@/components/form";
-
-// WebBrowser.maybeCompleteAuthSession();
 
 export default function AuthPage() {
   const { isSignedIn, isLoaded, signOut } = useAuth();
@@ -18,32 +15,17 @@ export default function AuthPage() {
   // store states here
   const mainUrl = useMainStore((state: any) => state.baseUrl);
   const isAuthOpen = useMainStore((state: any) => state.isAuthOpen);
+  const appIsLoading = useMainStore((state: any) => state.appLoading);
 
   // store functions
+  const toggleAppLoading = useMainStore((state: any)=> state.switchAppLoding)
   const setIsAuthOpen = useMainStore((state: any) => state.setIsAuthOpen);
-  const appIsLoading = useMainStore((state: any) => state.appLoading);
   const initializeCurrentUser = userStore((state: any) => state.initializeUser);
 
   const [imageUrl, setImageUrl] = useState("");
   const [userName, setUserName] = useState("");
   const [userEmail, setUserEmail] = useState("");
   const [userId, setUserId] = useState("");
-
-  if (!isLoaded) {
-    return (
-      <View className="flex-1 justify-center items-center">
-        <ActivityIndicator size="large" color="#0000ff" />
-      </View>
-    );
-  }
-
-  // // warming up the browser
-  // useEffect(() => {
-  //   WebBrowser.warmUpAsync();
-  //   return () => {
-  //     WebBrowser.coolDownAsync();
-  //   };
-  // }, []);
 
   // getting user infor once logged in
   useEffect(() => {
@@ -54,9 +36,33 @@ export default function AuthPage() {
     setUserName(user.username ?? user.firstName ?? "User");
     setUserEmail(user.primaryEmailAddress?.emailAddress ?? "");
 
-    // Auto-dismiss the login modal when successful
-    setIsAuthOpen(false);
-  }, [isSignedIn, user]);
+    if(!appIsLoading) toggleAppLoading()
+    // checking if user data is availible on cloud
+    const getUserdata = async ()=>{
+    const serverResponse = await fetch(`${mainUrl}/user/find-User${user.id}`, {method: "GET"})
+
+      if(!serverResponse.ok){
+        alert("Cant connect to Server!.\nChecking network connection and Try again!..")
+        router.navigate("/(tabs)")
+        signOut
+      }
+
+     else { 
+      const userData = await serverResponse.json()
+
+      if(userData.message === "Successfully FOUND user!.."){
+        initializeCurrentUser(extractUserInfo(userData.matchingUser))
+        router.navigate("/(tabs)")
+      }//end of inner if
+    }//end of else
+
+    if(appIsLoading) toggleAppLoading()
+    }//end of getUserdata inline function
+
+  getUserdata()
+  setIsAuthOpen(false);
+
+  }, [isSignedIn]);
 
   return (
     <View className="flex-1 justify-center items-center">
@@ -64,32 +70,15 @@ export default function AuthPage() {
         animationType="slide"
         visible={isAuthOpen}
         presentationStyle="pageSheet"
-        onRequestClose={async () => {
-          const serverResponse = await fetch(
-            `${mainUrl}/user/find-User${userId}`,
-            { method: "GET" },
-          );
-
-          if (!serverResponse.ok) {
-            alert("Server not Responding!.\nCheck network connection and try again!..");
-            router.navigate("/(tabs)");
-            signOut;
-          } else {
-            const userdata = await serverResponse.json();
-
-            if (userdata.message === "Successfully FOUND user!..") {
-              initializeCurrentUser(extractUserInfo(userdata.matchingUser));
-              router.navigate("/(tabs)");
-            }
-
-            else console.log("The user was not FOUND!..")
-          }
-
-          console.log("Closing the CLERK TAB!..")
-          setIsAuthOpen(false);
-        }}
       >
-        <AuthView />
+        <AuthView 
+        mode="signInOrUp"
+        isDismissible={true}
+        onDismiss={() => {  
+          setIsAuthOpen(false);     
+          router.navigate("/(tabs)")         
+          }}
+        />
       </Modal>
 
       {/* Only render the form when you actually have the user ID loaded */}

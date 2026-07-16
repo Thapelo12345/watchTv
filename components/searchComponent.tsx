@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { search, onlineSearch } from "@/utils/search-utils";
 import { useMainStore } from "@/stateManagement/store";
 
+
 export default function SearchComponent() {
   const pathname = usePathname();
 

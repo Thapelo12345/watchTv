@@ -1,10 +1,5 @@
-import {
-  View,
-  Text,
-  ScrollView,
-  Pressable,
-} from "react-native";
-import { ImageBackground } from 'expo-image';
+import { View, Text, ScrollView, Pressable } from "react-native";
+import { ImageBackground } from "expo-image";
 import "react-native-get-random-values";
 import { BlurView } from "expo-blur";
 import SelectComponent from "@/components/selector";
@@ -12,6 +7,7 @@ import { PlayIcon } from "react-native-heroicons/solid";
 import CastSection from "@/components/castSection";
 import { ActivityIndicator } from "react-native";
 import { useState, useEffect } from "react";
+import { router } from "expo-router";
 import { useMainStore } from "@/stateManagement/store";
 import { Play } from "@/utils/showInfo-util";
 
@@ -20,28 +16,40 @@ export default function Infor() {
 
   const [season, setSeason] = useState("Season 1");
   const [episode, setEpisode] = useState("Episode 1");
-  const [showHeader, setShowHeader] = useState(selected_show.seriesHeader)
-  const [AddingSeasonOnline, setAddingSeason] = useState(false)
+  const [showHeader, setShowHeader] = useState(selected_show.seriesHeader);
+  const [AddingSeasonOnline, setAddingSeason] = useState(false);
   const [playLoader, setPlayLoader] = useState(false);
-  const [showLanguage, setShowLanguage] = useState("Not specified!.")
+  const [showLanguage, setShowLanguage] = useState("Not specified!.");
 
-  const typeOfShow = useMainStore((state: any) => state.showType);
-  const pendingSeasons = selected_show.programmeType == "series" ? selected_show.programme.pendingSeasons.length !== 0 : false
+  const pendingSeasons =
+    selected_show?.programmeType == "series"
+      ? (selected_show?.programme?.pendingSeasons?.length || 0) !== 0
+      : false;
 
-  const genres = selected_show.programme.movieGenres || selected_show.programme.seriesGenres
-  const actors = selected_show.programme.movieCast || selected_show.programme.seriesCast
+  const genres =
+    selected_show?.programme?.movieGenres ||
+    selected_show?.programme?.seriesGenres ||
+    [];
+  const actors =
+    selected_show?.programme?.movieCast ||
+    selected_show?.programme?.seriesCast ||
+    [];
 
-    useEffect(()=>{
-      console.log("This is the header:", selected_show.programme.seriesHeader || selected_show.programme.movieHeader)
-      setShowHeader(selected_show.programme.seriesHeader)
+  useEffect(() => {
+    setShowHeader(selected_show.programme.seriesHeader);
+    const mainLanguage =
+      selected_show.programme.seriesLanguage ||
+      selected_show.programme.movieLanguage;
 
-      const mainLanguage = selected_show.programme.seriesLanguage || selected_show.programme.movieLanguage
-
-      if(mainLanguage[0] === "$" || mainLanguage === "" || !mainLanguage) setShowLanguage("NOT SPECIFIED")
-      else setShowLanguage(mainLanguage)
-
-
-    }, [selected_show])
+    if (
+      !mainLanguage ||
+      mainLanguage[0] === "$" ||
+      mainLanguage === "" ||
+      !mainLanguage
+    )
+      setShowLanguage("NOT SPECIFIED");
+    else setShowLanguage(mainLanguage);
+  }, [selected_show]);
 
   return (
     <View className="w-screen h-screen pb-10">
@@ -55,7 +63,12 @@ export default function Infor() {
         <View>
           <ImageBackground
             className="items-center h-170 w-full relative"
-            source={{uri: selected_show.programmeType === "series" ? selected_show.programme.seriesImageUrl: selected_show.programme.movieImageUrl}}
+            source={{
+              uri:
+                selected_show.programmeType === "series"
+                  ? selected_show.programme.seriesImageUrl
+                  : selected_show.programme.movieImageUrl,
+            }}
             transition={200} // Fast-fade transition will now work perfectly here!
             contentFit="cover" // Equivalent to resizeMode
           >
@@ -64,11 +77,10 @@ export default function Infor() {
               {!playLoader ? (
                 <Pressable
                   onPress={async () => {
-                    if(AddingSeasonOnline) return
+                    if (AddingSeasonOnline) return;
 
                     setPlayLoader(true);
-                    Play(selected_show, season, episode, setPlayLoader)
-
+                    Play(selected_show, season, episode, setPlayLoader);
                   }}
                 >
                   <PlayIcon className="self-center" color="white" size={80} />
@@ -79,7 +91,7 @@ export default function Infor() {
             </View>
 
             <BlurView
-              className={`flex justify-evenly absolute bottom-0 left-0 w-full ${selected_show.programmeType === "series"? "h-60" :"h-30"}`}
+              className={`flex justify-evenly absolute bottom-0 left-0 w-full ${selected_show.programmeType === "series" ? "h-60" : "h-30"}`}
               intensity={130}
               tint="dark"
             >
@@ -97,7 +109,8 @@ export default function Infor() {
                 <Text className="text-white font-lora text-lg">Genres:</Text>
                 {genres.map((genre: string) => (
                   <Text className="text-white text-lg" key={genre}>
-                    {" "}{genre},{" "}
+                    {" "}
+                    {genre},{" "}
                   </Text>
                 ))}
               </View>
@@ -126,14 +139,13 @@ export default function Infor() {
           Description
         </Text>
         <Text className="p-2 text-base font-lora text-center leading-relaxed">
-          {typeOfShow == "series"
+          {selected_show.pogrameType === "series"
             ? selected_show.programme.seriesDescription
             : selected_show.programme.movieDescription}
         </Text>
 
         {/* Cast items here */}
-        <CastSection castArray={actors}/>
-        
+        <CastSection castArray={actors} />
       </ScrollView>
     </View>
   );

@@ -10,12 +10,11 @@ import SearchComponent from "@/components/searchComponent";
 import { useMainStore } from "@/stateManagement/store";
 import { useEffect } from "react";
 
-
 export default function TabLayout() {
   const getMovies = useMainStore((state: any) => state.getMovies);
   const getSeries = useMainStore((state: any) => state.getSeries);
-  const mainUrl = useMainStore((state: any)=> state.baseUrl)
-  
+  const mainUrl = useMainStore((state: any) => state.baseUrl);
+
   const moviesUrl = `${mainUrl}/movies/programs`,
     seriesUrl = `${mainUrl}/series/programs`;
 
@@ -23,8 +22,8 @@ export default function TabLayout() {
     try {
       const response = await fetch(showUrl, { method: "GET" });
 
-      if(!response.ok) throw new Error("Failed to retch server!..")
-        
+      if (!response.ok) throw new Error("Failed to retch server!..");
+
       if (response.status !== 200) {
         alert("Failed to get data from server!.");
         return [];
@@ -33,22 +32,29 @@ export default function TabLayout() {
       // 2. FIXED: Added 'await' before response.json()
       const showData: any = await response.json();
       return showData.data;
-    } catch (err: unknown ) {
-      const errMessage = err instanceof Error ? err.message : "unknown server error!.."
+    } catch (err: unknown) {
+      const errMessage =
+        err instanceof Error ? err.message : "unknown server error!..";
       console.error("Network Fetch Error: ", errMessage);
       return [];
     }
   }; //end of fetching show
-
-  
 
   useEffect(() => {
     const loadData = async () => {
       const moviesData = await getShows(moviesUrl);
       const seriesData = await getShows(seriesUrl);
 
-      getMovies(moviesData);
-      getSeries(seriesData);
+      getMovies(
+        [...moviesData].sort(
+          (a, b) => Number(b.movieYear) - Number(a.movieYear),
+        ),
+      );
+      getSeries(
+        [...seriesData].sort(
+          (a, b) => Number(b.seriesYear) - Number(a.seriesYear),
+        ),
+      );
     };
 
     loadData();
@@ -64,24 +70,30 @@ export default function TabLayout() {
 
           // main bar
           tabBarStyle: {
-            backgroundColor: "white",
-            boxShadow: "inset 2px 2px 8px whitesmoke, inset -2px -2px 8px whitesmoke, 1px 7px 8px white, 1px 2px 5.5px black, -1px -7px 8px white,",
+            position: "absolute",
+            bottom: 10,
+            left:"5%",
+            right: "5%",
+            backgroundColor: "transparent",
+            borderTopWidth: 0,
+            elevation: 0,
             borderRadius: 10,
             width: 400,
             height: 60,
             margin: 10,
-            overflow: "hidden"
+            overflow: "hidden",
           },
 
-          tabBarActiveTintColor:"white",
-          tabBarAllowFontScaling: true,
           
-          tabBarActiveBackgroundColor: "skyblue",
+          tabBarActiveTintColor: "white",
+          tabBarAllowFontScaling: true,
+          tabBarActiveBackgroundColor: "#2d96eb",
+          tabBarInactiveTintColor: "white",
 
           tabBarItemStyle: {
-            backgroundColor: "white",
-            height: 60,
-
+            
+            backgroundColor: "rgba(0, 60, 80, 0.8)",
+            height: 57,
           },
         }}
       >
@@ -94,19 +106,19 @@ export default function TabLayout() {
             ),
 
             tabBarButton: (props: any) => (
-      <TouchableOpacity
-        {...props}
-        style={[
-          props.style, 
-          {
-            borderRadius: 50,
-            width: 60,
-            overflow: 'hidden',
-          }
-        ]}
-        activeOpacity={0.7}
-      />
-    ),
+              <TouchableOpacity
+                {...props}
+                style={[
+                  props.style,
+                  {
+                    borderRadius: 50,
+                    width: 60,
+                    overflow: "hidden",
+                  },
+                ]}
+                activeOpacity={0.7}
+              />
+            ),
           }}
         />
 
@@ -118,19 +130,19 @@ export default function TabLayout() {
               <TvIcon color={color} size={focused ? 17 : 15} />
             ),
             tabBarButton: (props: any) => (
-      <TouchableOpacity
-        {...props}
-        style={[
-          props.style, 
-          {
-            borderRadius: 50,
-            width: 60,
-            overflow: 'hidden',
-          }
-        ]}
-        activeOpacity={0.7}
-      />
-    ),
+              <TouchableOpacity
+                {...props}
+                style={[
+                  props.style,
+                  {
+                    borderRadius: 50,
+                    width: 60,
+                    overflow: "hidden",
+                  },
+                ]}
+                activeOpacity={0.7}
+              />
+            ),
           }}
         />
 
@@ -142,19 +154,19 @@ export default function TabLayout() {
               <FilmIcon color={color} size={focused ? 17 : 15} />
             ),
             tabBarButton: (props: any) => (
-      <TouchableOpacity
-        {...props}
-        style={[
-          props.style, 
-          {
-            borderRadius: 50,
-            width: 60,
-            overflow: 'hidden',
-          }
-        ]}
-        activeOpacity={0.7}
-      />
-    ),
+              <TouchableOpacity
+                {...props}
+                style={[
+                  props.style,
+                  {
+                    borderRadius: 50,
+                    width: 60,
+                    overflow: "hidden",
+                  },
+                ]}
+                activeOpacity={0.7}
+              />
+            ),
           }}
         />
 
@@ -166,19 +178,19 @@ export default function TabLayout() {
               <Cog6ToothIcon color={color} size={focused ? 17 : 15} />
             ),
             tabBarButton: (props: any) => (
-      <TouchableOpacity
-        {...props}
-        style={[
-          props.style, 
-          {
-            borderRadius: 50,
-            width: 60,
-            overflow: 'hidden',
-          }
-        ]}
-        activeOpacity={0.7}
-      />
-    ),
+              <TouchableOpacity
+                {...props}
+                style={[
+                  props.style,
+                  {
+                    borderRadius: 50,
+                    width: 60,
+                    overflow: "hidden",
+                  },
+                ]}
+                activeOpacity={0.7}
+              />
+            ),
           }}
         />
       </Tabs>

@@ -29,8 +29,9 @@
         @apply flex flex-col items-center justify-evenly;
     }
     .pageHeaders {
-        @apply text-white shadow-2xl shadow-black w-fit font-lobster bg-green-600 text-2xl text-center p-2 px-6 rounded-lg mb-2 mt-5;
-        box-shadow: 2px 2px 4px white, 2px 2px 4px black;
+        @apply text-white shadow-2xl shadow-black w-fit font-lobster bg-blue-400 text-2xl text-center p-2 px-6 rounded-lg mb-2 mt-5;
+        box-shadow: inset 3px 3px 5px white, 2px 4px 7px black;
+        text-shadow: 1px 1px 2px black;
     }
 
     .input-text {
