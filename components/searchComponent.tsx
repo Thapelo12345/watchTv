@@ -4,10 +4,11 @@ import { usePathname } from "expo-router";
 import { useEffect, useState } from "react";
 import { search, onlineSearch } from "@/utils/search-utils";
 import { useMainStore } from "@/stateManagement/store";
-
+import { useAuth } from "@clerk/expo";
 
 export default function SearchComponent() {
   const pathname = usePathname();
+  const {isLoaded, isSignedIn } = useAuth()
 
   const searchResult = useMainStore((state: any) => state.searchResults);
   const emptySearchResults = useMainStore((state: any) => state.clearSearchResults);
@@ -18,8 +19,9 @@ export default function SearchComponent() {
   function resetInput() {setSearhText("");}
 
   useEffect(() => {
-    if (pathname == "/" && !hide) setHide(true);
-    else if (hide && pathname !== "/") setHide(false);
+
+    if ((pathname === "/" || pathname === "/settings") && !hide) setHide(true);
+    else if (hide && (pathname !== "/" && pathname !== "/settings")) setHide(false);
     if (searchText !== "") resetInput();
 
     if (searchResult.length !== 0) emptySearchResults();
@@ -41,8 +43,16 @@ export default function SearchComponent() {
       />
 
       <Pressable
-        className="bg-[skyblue] p-2 rounded-md shadow-2xl"
+        className="bg-blue-400 p-2 rounded-md"
         onPress={async () => {
+          if(!isLoaded) return
+
+          if(!isSignedIn){
+            Alert.alert("APP LOCKED!.", "Your must Login First!.",
+              [{text: "OK", onPress: ()=> console.log("User Blocked!")}]
+            )
+            return
+          }
           const typeOfShow = pathname === "/series" ? "series" : "movies";
           onlineSearch(typeOfShow, searchText)
         }}

@@ -5,6 +5,7 @@ import { useMainStore } from "@/stateManagement/store";
 import MediaScreen from "@/components/mediaPlayer";
 
 export default function Home() {
+  
   const movies = useMainStore((state: any) => state.movies);
   const series = useMainStore((state: any) => state.series);
 

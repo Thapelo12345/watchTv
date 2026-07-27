@@ -5,10 +5,14 @@ import { useEffect, useState, useRef } from "react";
 import MediaInfo from "./ui/mediaInf";
 
 export default function MediaScreen() {
+
+  // store state
   const movies = useMainStore((state: any) => state.movies);
   const series = useMainStore((state: any) => state.series);
 
   const allProgramms: any = useRef([]);
+  const saveTo = useRef("")
+
   const [newShow, setNewShow] = useState(null);
 
   const gettingImage = (programme: any) =>
@@ -41,15 +45,20 @@ export default function MediaScreen() {
       allProgramms.current = [...movies, ...series];
       downloadingImages(allProgramms.current);
 
+
       const slideCounter = setInterval(() => {
-        const randomNumber =
-          Math.floor(Math.random() * allProgramms.current.length) + 1;
-        setNewShow(allProgramms.current[randomNumber]);
-      }, 7500);
+        const randomNumber = Math.floor(Math.random() * allProgramms.current.length);
+
+        const tempHolder = allProgramms.current[randomNumber]
+        tempHolder.seriesSeasons === undefined ? saveTo.current = "movies" : saveTo.current = "series"
+
+        setNewShow(tempHolder);
+      }, 7800);
 
       return () => clearInterval(slideCounter);
     }
   }, [movies, series]);
+
 
   return (
     <View className="flex-1 items-center justify-center relative w-full h-115 -z-20 overflow-hidden">
@@ -67,15 +76,14 @@ export default function MediaScreen() {
         />
       )}
 
-      {!newShow ? (
-        <ActivityIndicator size="large" color="royalblue" />
-      ) : (
+      {newShow &&
         <MediaInfo
+          folder={saveTo.current}
           showHeader={gettingHeader(newShow)}
           genres={gettingGenres(newShow)}
           show={newShow}
         />
-      )}
+      }
     </View>
   );
 }

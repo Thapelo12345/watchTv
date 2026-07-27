@@ -3,6 +3,7 @@ import DropDown from "./dropDown";
 import { PlusIcon } from "react-native-heroicons/solid";
 import { useMainStore } from "@/stateManagement/store";
 import { useEffect, useState } from "react";
+import { useAuth } from "@clerk/expo";
 
 type PROPS = {
   showTitle: string;
@@ -27,6 +28,9 @@ export default function SelectComponent({
   setSeason,
   setEpisode,
 }: PROPS) {
+
+  const { isLoaded, isSignedIn } = useAuth()
+
   const baseUrl = useMainStore((state: any) => state.baseUrl);
   const addToMainSeries = useMainStore((state: any) => state.addSeasonToSeries);
   const addToSelected = useMainStore((state: any) => state.addSeasonToSelected);
@@ -97,6 +101,14 @@ export default function SelectComponent({
         ) : (
           <Pressable
             onPress={async () => {
+              if(!isLoaded) return
+
+              if(!isSignedIn){
+                Alert.alert("APP LOCKED!.", "You Need an account first, Before you can Add a new Series show",
+                  [{text: "OK", onPress: ()=> console.log("App Locked!.")}]
+                )
+                return
+              }
               setaddingSeason(true);
 
               const response = await fetch(`${baseUrl}/series/add-season`, {

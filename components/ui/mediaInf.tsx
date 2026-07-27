@@ -3,16 +3,35 @@ import { BlurView } from "expo-blur";
 import { v4 as uuidv4 } from "uuid";
 import { router } from "expo-router";
 import { useMainStore } from "@/stateManagement/store";
-import { PlayIcon, PlusIcon } from "react-native-heroicons/solid";
+import { userStore } from "@/stateManagement/userStore"
+import { PlayIcon, PlusIcon, HeartIcon } from "react-native-heroicons/solid";
+import { useState } from "react";
+import { addRemoveLikedProgramme } from "@/utils/media-utils";
+import { useAuth } from "@clerk/expo";
+import { Alert } from "react-native";
 
 type PROPS = {
+  folder: string;
   showHeader: string;
   genres: string[];
   show: any;
 };
 
-export default function MediaInfo({ showHeader, genres, show }: PROPS) {
+export default function MediaInfo({
+  folder,
+  showHeader,
+  genres,
+  show,
+}: PROPS) {
+
+  const { isLoaded, isSignedIn } = useAuth()
   const setShow = useMainStore((state: any) => state.set_selected_show);
+
+  // store states
+  const likedShows = userStore((state: any)=> state.userLiked)
+
+  const lickedUnlicked = likedShows.userSeries.includes(showHeader) || likedShows.userMovies.includes(showHeader)
+  const [waitForserver, setWaitForServer] = useState(false);
 
   return (
     <BlurView
@@ -36,7 +55,7 @@ export default function MediaInfo({ showHeader, genres, show }: PROPS) {
       <View className="p-2flex flex-row">
         <Pressable
           onPress={() => {
-            const showType = !show.seriesHeader ? "movie" : "series"
+            const showType = !show.seriesHeader ? "movie" : "series";
             setShow(show, showType);
             router.navigate("../showInfo");
           }}
@@ -47,9 +66,34 @@ export default function MediaInfo({ showHeader, genres, show }: PROPS) {
           </View>
         </Pressable>
 
-        <Pressable>
+        <Pressable
+          onPress={async () => {
+            if(!isLoaded) return
+
+            if(!isSignedIn){
+              Alert.alert("APP LOCKED!.", "Cant Add Shows Without an account!.",
+                [{text: "OK", onPress: ()=> console.log("Locked!")}]
+              )
+              return
+            }
+            if (waitForserver) return;
+
+            setWaitForServer(true);
+
+            const finish = await addRemoveLikedProgramme(
+              showHeader,
+              folder,
+              lickedUnlicked ? "remove" : "add",
+            );
+            if (finish === "update done") setWaitForServer(false);
+          }}
+        >
           <View className="media-btn-container">
-            <PlusIcon color="white" size={20} />
+            {lickedUnlicked ? (
+              <HeartIcon color="white" size={20} />
+            ) : (
+              <PlusIcon color="white" size={20} />
+            )}
             <Text className="media-btn">My List</Text>
           </View>
         </Pressable>

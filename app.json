@@ -7,7 +7,7 @@
     "icon": "./assets/images/icon.png",
     "scheme": "watchtv",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": false,
+    "newArchEnabled": true,
     "splash": {
       "image": "./assets/images/splash-icon.png",
       "resizeMode": "contain",
@@ -28,7 +28,8 @@
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "permissions": [],
-      "package": "com.thapelo1.watchTv"
+      "package": "com.thapelo1.watchTv",
+      "launchMode": "singleTask" 
     },
     "web": {
       "bundler": "metro",

@@ -9,8 +9,12 @@ import {
 import SearchComponent from "@/components/searchComponent";
 import { useMainStore } from "@/stateManagement/store";
 import { useEffect } from "react";
+import { useAuth } from "@clerk/expo";
 
 export default function TabLayout() {
+
+  const { isLoaded, isSignedIn } = useAuth()
+
   const getMovies = useMainStore((state: any) => state.getMovies);
   const getSeries = useMainStore((state: any) => state.getSeries);
   const mainUrl = useMainStore((state: any) => state.baseUrl);
@@ -178,13 +182,15 @@ export default function TabLayout() {
               <Cog6ToothIcon color={color} size={focused ? 17 : 15} />
             ),
             tabBarButton: (props: any) => (
+              
               <TouchableOpacity
                 {...props}
+                disabled={!isSignedIn}
                 style={[
                   props.style,
                   {
                     borderRadius: 50,
-                    width: 60,
+                    width: 50,
                     overflow: "hidden",
                   },
                 ]}

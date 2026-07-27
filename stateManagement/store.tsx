@@ -12,7 +12,6 @@ type STORETYPES ={
   searchResults: any[],
   searching: boolean;
   onlineSearch: boolean;
-  isAuthOpen: boolean;
   appLoading: boolean;
   getMovies: (value: any)=> void;
   addMovie: (value: any)=> void;
@@ -31,13 +30,12 @@ type STORETYPES ={
   clearSearchResults: ()=> void;
   setSearching: ()=> void,
   setOnlineSearch: ()=> void,
-  setIsAuthOpen: (value: boolean)=> void;
   switchAppLoding:()=> void,
 
 }
 
 export const useMainStore = create((set)=>({
-  baseUrl: "http://192.168.18.7:3000",
+  baseUrl: "http://192.168.18.7:5000",
     movies: [],
     series: [],
     selectedShow: {programme: null, programmeType: null},
@@ -48,7 +46,6 @@ export const useMainStore = create((set)=>({
     searchResults: [],
     searching: false,
     onlineSearch: false,
-    isAuthOpen: false,
     appLoading: false,
   getMovies: (newMovie: any)=> set({movies: newMovie}),
   addMovie: (newMovie: any)=> set((state: any)=> ({movies: [...state.movies, newMovie]})),
@@ -74,7 +71,7 @@ export const useMainStore = create((set)=>({
       seriesSeasons: [...show.seriesSeasons, newSeason],
       pendingSeasons: show.pendingSeasons.slice(1) // Removes the first item safely
     };
-  })
+  })//end of map
 })),
   set_selected_show: (newShow: any, type_of_show: string) => 
   set((state: any) => ({ 
@@ -99,6 +96,5 @@ export const useMainStore = create((set)=>({
   removeSearchResults: (oldResults: any)=> set((state: any)=>({searchResults: state.searchResults.filter((item: any)=> item._id !== oldResults._id)})),
   clearSearchResults: ()=> set({searchResults: []}),
   setUserStatus: (newStatus: string)=> set({userStatus: newStatus}),
-  setIsAuthOpen: (newStatus: boolean)=> set({isAuthOpen: newStatus}),
   switchAppLoding:()=> set((state: any)=> ({appLoading: !state.appLoading})),
 }))

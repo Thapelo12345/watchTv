@@ -8,11 +8,14 @@ import CastSection from "@/components/castSection";
 import { ActivityIndicator } from "react-native";
 import { useState, useEffect } from "react";
 import { router } from "expo-router";
+import { useAuth } from "@clerk/expo";
 import { useMainStore } from "@/stateManagement/store";
 import { Play } from "@/utils/showInfo-util";
+import { Alert } from "react-native";
 
 export default function Infor() {
   const selected_show = useMainStore((state: any) => state.selectedShow);
+  const { isLoaded , isSignedIn } = useAuth()
 
   const [season, setSeason] = useState("Season 1");
   const [episode, setEpisode] = useState("Episode 1");
@@ -77,7 +80,12 @@ export default function Infor() {
               {!playLoader ? (
                 <Pressable
                   onPress={async () => {
-                    if (AddingSeasonOnline) return;
+                    if (AddingSeasonOnline || !isLoaded) return;
+
+                    if(!isSignedIn){
+                      Alert.alert("App Locked!.", "You must have an account To Watch shows!", [{text:"OK", onPress: ()=> console.log("Locked!")}])
+                      return
+                    }
 
                     setPlayLoader(true);
                     Play(selected_show, season, episode, setPlayLoader);
