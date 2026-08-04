@@ -21,8 +21,10 @@ export default function ListContainer() {
     setMovieList(likedShows.userMovies);
     setSeriesList(likedShows.userSeries);
 
-    setHistory(History);
+    const tempHistory = ContinueList.map((item: any)=> item.programmeName);
+    setHistory(tempHistory);
     setContinueList(ContinueList);
+
   }, [likedShows, ContinueList, History]);
 
   return (
@@ -30,9 +32,9 @@ export default function ListContainer() {
       <lickedModal.Provider value={{ modalOpen, setModal }}>
         <ShowList ActionIcon={HeartIcon} listName="Movies" listArray={moviesList} />
         <ShowList ActionIcon={HeartIcon} listName="Series" listArray={seriesList} />
-
+{/* 
         <ShowList ActionIcon={ClockIcon} listName="Watch History" listArray={history} />
-        <ShowList ActionIcon={ForwardIcon} listName="Continue to Watch" listArray={continueList} />
+        <ShowList ActionIcon={ForwardIcon} listName="Continue to Watch" listArray={continueList} /> */}
       </lickedModal.Provider>
     </View>
   );

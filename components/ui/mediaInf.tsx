@@ -44,7 +44,7 @@ export default function MediaInfo({
       </Text>
 
       <View className="flex flex-row mx-4">
-        {genres.map((genre) => (
+        {genres !== undefined && genres.map((genre) => (
           <Text className="text-white font-lora text-lg" key={uuidv4()}>
             {" "}
             {genre}

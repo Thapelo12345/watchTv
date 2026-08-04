@@ -1,100 +1,137 @@
 import { create } from "zustand";
+type SEASON = {season: string;  episode: string;}
 
-type STORETYPES ={
+type STORETYPES = {
   baseUrl: string;
-  movies: any[],
+  movies: any[];
+  latestMovies: any[];
   series: any[];
-  selectedShow: {programme: any, programmeType:string};
+  latestSeries: any[];
+  selectedShow: { programme: any; programmeType: string };
   selectedPosition: number;
   showType: string;
   playUrl: string;
   playing: boolean;
-  searchResults: any[],
+  searchResults: any[];
   searching: boolean;
   onlineSearch: boolean;
   appLoading: boolean;
-  getMovies: (value: any)=> void;
-  addMovie: (value: any)=> void;
-  editMovies:(pos: number, newObj: any)=> void;//replacing one value from the array tv programme
-  getSeries: (value: any)=> void;
-  addSeries: (value: any)=> void;
-  addSeasonToSeries:(title: string, newSeason: any)=> void;
-  editSeries: (pos: number, newObj: any) => void;//replacing one value from the array tv programme
-  set_selected_show: (value1: any, value2: string)=> void;
-  addSeasonToSelected: (title: string, newSeason: any)=> void;
-  setUrl: (value: string)=> void;
-  setPlaying: (value: boolean)=> void;
-  getSelectedPosition: (value: number)=> void;
-  addSearchResults: (value: any)=> void;
-  removeSearchResults: (value: any)=> void;
-  clearSearchResults: ()=> void;
-  setSearching: ()=> void,
-  setOnlineSearch: ()=> void,
-  switchAppLoding:()=> void,
+  imagesDownloaded: boolean;
+  playingProgramme:{
+    programmeName: string;
+    programmeSeason?:SEASON;
+  };
+  setPlayingProgramme: (value: {programmeName: string; programmeSeason?:SEASON}) => void;
+  setImageDownloaded: (value: boolean) => void;
+  getMovies: (value: any) => void;
+  addMovie: (value: any) => void;
+  addLatestMovie: (value: any) => void;
+  editMovies: (pos: number, newObj: any) => void; //replacing one value from the array tv programme
+  getSeries: (value: any) => void;
+  addSeries: (value: any) => void;
+  addLatestSeries: (value: any) => void;
+  addSeasonToSeries: (title: string, newSeason: any) => void;
+  editSeries: (pos: number, newObj: any) => void; //replacing one value from the array tv programme
+  set_selected_show: (value1: any, value2: string) => void;
+  addSeasonToSelected: (title: string, newSeason: any) => void;
+  setUrl: (value: string) => void;
+  setPlaying: (value: boolean) => void;
+  getSelectedPosition: (value: number) => void;
+  addSearchResults: (value: any) => void;
+  removeSearchResults: (value: any) => void;
+  clearSearchResults: () => void;
+  setSearching: () => void;
+  setOnlineSearch: () => void;
+  switchAppLoding: () => void;
+};
 
-}
-
-export const useMainStore = create((set)=>({
+export const useMainStore = create((set) => ({
   baseUrl: "http://192.168.18.7:5000",
-    movies: [],
-    series: [],
-    selectedShow: {programme: null, programmeType: null},
-    selectedPosition: -1,
-    showType: "series",
-    playUrl: null,
-    playing: false,
-    searchResults: [],
-    searching: false,
-    onlineSearch: false,
-    appLoading: false,
-  getMovies: (newMovie: any)=> set({movies: newMovie}),
-  addMovie: (newMovie: any)=> set((state: any)=> ({movies: [...state.movies, newMovie]})),
-  editMovies: (position: number, newTvProgramme: any)=> set((state: any) => {
+  movies: [],
+  latestMovies: [],
+  series: [],
+  latestSeries: [],
+  selectedShow: { programme: null, programmeType: null },
+  selectedPosition: -1,
+  showType: "series",
+  playUrl: null,
+  playing: false,
+  searchResults: [],
+  searching: false,
+  onlineSearch: false,
+  appLoading: false,
+  imagesDownloaded: false,
+  playingProgramme: {programmeName: null, programmeSeason: null},
+  setPlayingProgramme: (validValue: {programmeName: string; programmeSeason?:SEASON}) => set({playingProgramme: validValue}),
+  setImageDownloaded: (validValue: boolean) => set({imagesDownloaded: validValue}),
+  getMovies: (newMovie: any) => set({ movies: newMovie }),
+  addMovie: (newMovie: any) =>
+    set((state: any) => ({ movies: [...state.movies, newMovie] })),
+  addLatestMovie: (newMovie: any) =>
+    set({ latestMovies: newMovie}),
+  editMovies: (position: number, newTvProgramme: any) =>
+    set((state: any) => {
       const updatedMovies = [...state.movies]; // 1. Copy array
       updatedMovies[position] = newTvProgramme; // 2. Modify index
-      return { movies: updatedMovies };       // 3. Return update
+      return { movies: updatedMovies }; // 3. Return update
     }),
 
-  getSeries: (newSeires: any)=> set({ series: newSeires}),
-  addSeries: (newSeries: any)=> set((state: any)=>({series: [...state.series, newSeries]})),
-  editSeries: (position: number, newTvProgramme: any)=>set((state: any) => {
+  getSeries: (newSeires: any) => set({ series: newSeires }),
+  addSeries: (newSeries: any) =>
+    set((state: any) => ({ series: [...state.series, newSeries] })),
+  addLatestSeries: (newSeries: any) =>set({ latestSeries: newSeries}),
+  editSeries: (position: number, newTvProgramme: any) =>
+    set((state: any) => {
       const updateSeries = [...state.series]; // 1. Copy array
       updateSeries[position] = newTvProgramme; // 2. Modify index
-      return { series: updateSeries };       // 3. Return update
+      return { series: updateSeries }; // 3. Return update
     }),
-    addSeasonToSeries: (title: string, newSeason: any) => set((state: any) => ({
-    series: state.series.map((show: any) => {
-    if (show.seriesHeader !== title) return show;
+  addSeasonToSeries: (title: string, newSeason: any) =>
+    set((state: any) => ({
+      series: state.series.map((show: any) => {
+        if (show.seriesHeader !== title) return show;
 
-    return {
-      ...show,
-      seriesSeasons: [...show.seriesSeasons, newSeason],
-      pendingSeasons: show.pendingSeasons.slice(1) // Removes the first item safely
-    };
-  })//end of map
-})),
-  set_selected_show: (newShow: any, type_of_show: string) => 
-  set((state: any) => ({ 
-    selectedShow: { 
-      programme: newShow, 
-      programmeType: type_of_show 
-    } 
-  })),
-  addSeasonToSelected: (newSeason: any) => set((state: any)=>({
-    selectedShow:{
-      ...state.selectedShow,
-      seriesSeasons: [...state.selectedShow.seriesSeasons, newSeason],
-      pendingSeasons: state.selectedShow.pendingSeasons.slice(1)
-    }
-  })),
-  getSelectedPosition: (newPosistion: number)=> set({selectedPosition: newPosistion}),
-  setUrl: (newUrl: string)=> set({playUrl: newUrl}),
-  setPlaying: (position: boolean)=> set({playing: position}),
-  setSearching: ()=> set((state: any)=> ({searching: !state.searching})),
-  setOnlineSearch: ()=> set((state: any)=> ({onlineSearch: !state.onlineSearch})),
-  addSearchResults: (newResults: any)=> set((state:any)=> ({searchResults: [...state.searchResults, newResults]})),
-  removeSearchResults: (oldResults: any)=> set((state: any)=>({searchResults: state.searchResults.filter((item: any)=> item._id !== oldResults._id)})),
-  clearSearchResults: ()=> set({searchResults: []}),
-  setUserStatus: (newStatus: string)=> set({userStatus: newStatus}),
-  switchAppLoding:()=> set((state: any)=> ({appLoading: !state.appLoading})),
-}))
+        return {
+          ...show,
+          seriesSeasons: [...show.seriesSeasons, newSeason],
+          pendingSeasons: show.pendingSeasons.slice(1), // Removes the first item safely
+        };
+      }), //end of map
+    })),
+  set_selected_show: (newShow: any, type_of_show: string) =>
+    set((state: any) => ({
+      selectedShow: {
+        programme: newShow,
+        programmeType: type_of_show,
+      },
+    })),
+  addSeasonToSelected: (newSeason: any) =>
+    set((state: any) => ({
+      selectedShow: {
+        ...state.selectedShow,
+        seriesSeasons: [...state.selectedShow.seriesSeasons, newSeason],
+        pendingSeasons: state.selectedShow.pendingSeasons.slice(1),
+      },
+    })),
+  getSelectedPosition: (newPosistion: number) =>
+    set({ selectedPosition: newPosistion }),
+  setUrl: (newUrl: string) => set({ playUrl: newUrl }),
+  setPlaying: (position: boolean) => set({ playing: position }),
+  setSearching: () => set((state: any) => ({ searching: !state.searching })),
+  setOnlineSearch: () =>
+    set((state: any) => ({ onlineSearch: !state.onlineSearch })),
+  addSearchResults: (newResults: any) =>
+    set((state: any) => ({
+      searchResults: [...state.searchResults, newResults],
+    })),
+  removeSearchResults: (oldResults: any) =>
+    set((state: any) => ({
+      searchResults: state.searchResults.filter(
+        (item: any) => item._id !== oldResults._id,
+      ),
+    })),
+  clearSearchResults: () => set({ searchResults: [] }),
+  setUserStatus: (newStatus: string) => set({ userStatus: newStatus }),
+  switchAppLoding: () =>
+    set((state: any) => ({ appLoading: !state.appLoading })),
+}));

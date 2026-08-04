@@ -1,5 +1,6 @@
 import { create } from "zustand";
 type IMAGE = { imageId: string, imageUrl: string }
+type SEASON = {season: string;  episode: string;}
 
  type USERTYPES = {
     userId: string,
@@ -10,7 +11,10 @@ type IMAGE = { imageId: string, imageUrl: string }
     paymentMethod: string,
     daysLeft: number,
     accountCanceled: string,
-    continueWatching: string[],
+    continueWatching:{
+      programmeName: string;
+      programmeSeason?: SEASON;
+    }[],
     userLiked: {
       userSeries: string[],
       userMovies: string[]
@@ -22,7 +26,7 @@ type IMAGE = { imageId: string, imageUrl: string }
     initializeUser: (value: Partial<USERTYPES>)=> void,
     setUserName: (value: string)=> void,
     setUserNewImage: (value: IMAGE)=> void,
-    addUnfinishedShow: (value: string)=> void,
+    addUnfinishedShow: (value: {programmeName: string, programmeSeason?: SEASON})=> void,
     addWatchedShow: (value: string)=> void,
     removeWatchShow: (value: string)=> void,
     addPreferedGenre: (value: string)=> void,
@@ -30,8 +34,7 @@ type IMAGE = { imageId: string, imageUrl: string }
     addLikedMovies: (value: string)=> void,
     removeLikedSeries: (value: string)=> void,
     removeLikedMovies: (value: string)=> void,
-    addContinueWatch: (value: string)=> void,
-    removeContinueWatch: (value: string)=> void,
+    removeUnfinishedShow: (value: string)=> void,
     setUserInitialized: (value: boolean)=> void,
  }
 
@@ -69,11 +72,11 @@ type IMAGE = { imageId: string, imageUrl: string }
     })),//end of iniliazer  function
     setUserName: (newName: string)=> set({userName: newName}),
     setUserNewImage:(newImage: IMAGE)=> set({profilePicture: newImage}),
-    addUnfinishedShow: (showName: string)=> set((state: any)=> ({continueWatching: [...state.continueWatching, showName]})),
+    addUnfinishedShow: (show: {programmeName: string, programmeSeason?: SEASON})=> set((state: any)=> ({continueWatching: [...state.continueWatching, show]})),
     addWatchedShow: (showName: string)=> set((state: any)=> ({watchHistory: [...state.watchHistory, showName]})),
     removeWatchShow: (showName: string)=> set((state: any)=> ({watchHistory: state.watchHistory.filter((show: string)=> show !== showName)})),
     addPreferedGenre: (genre: string)=> set((state: any)=> ({userPrefferedGenres: [...state.userPrefferedGenres, genre]})),
-    removeContinueWatch: (showName: string)=> set((state: any)=> ({continueWatching: state.continueWatching.filter((show: string)=> show !== showName)})),
+    removeUnfinishedShow: (showName: string)=> set((state: any)=> ({continueWatching: state.continueWatching.filter((show: {programmeName: string})=> show.programmeName !== showName)})),
     addLikedSeries: (likedSeries: string) => set((state: any) => ({
     userLiked: {
       ...state.userLiked, // Keeps userMovies intact

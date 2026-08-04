@@ -29,7 +29,11 @@
       "predictiveBackGestureEnabled": false,
       "permissions": [],
       "package": "com.thapelo1.watchTv",
-      "launchMode": "singleTask" 
+       "proguardRuleOrders": ["-keep class org.slf4j.** { *; }", "-dontwarn org.slf4j.**"],
+      "launchMode": "singleTask",
+      "usesCleartextTraffic": true,
+      "networkSecurityConfig": "./network-security-config.xml",
+      "hardwareAccelerated": false
     },
     "web": {
       "bundler": "metro",

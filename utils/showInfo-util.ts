@@ -77,9 +77,6 @@ export async function Play(
         return;}
   
         const data = await response.json();
-        console.log(`This is data:\n${data}\n`);
-        console.log(`This is the url from th server:\n${data.playLink}`);
-
       if (!data.playLink) {
         Alert.alert("PROGRESS", "URL NOT FOUND!", [
         { text: "OK", onPress: () => playLoader(false) }]);

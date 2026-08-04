@@ -12,57 +12,8 @@ import { useEffect } from "react";
 import { useAuth } from "@clerk/expo";
 
 export default function TabLayout() {
-
-  const { isLoaded, isSignedIn } = useAuth()
-
-  const getMovies = useMainStore((state: any) => state.getMovies);
-  const getSeries = useMainStore((state: any) => state.getSeries);
-  const mainUrl = useMainStore((state: any) => state.baseUrl);
-
-  const moviesUrl = `${mainUrl}/movies/programs`,
-    seriesUrl = `${mainUrl}/series/programs`;
-
-  const getShows = async (showUrl: string) => {
-    try {
-      const response = await fetch(showUrl, { method: "GET" });
-
-      if (!response.ok) throw new Error("Failed to retch server!..");
-
-      if (response.status !== 200) {
-        alert("Failed to get data from server!.");
-        return [];
-      }
-
-      // 2. FIXED: Added 'await' before response.json()
-      const showData: any = await response.json();
-      return showData.data;
-    } catch (err: unknown) {
-      const errMessage =
-        err instanceof Error ? err.message : "unknown server error!..";
-      console.error("Network Fetch Error: ", errMessage);
-      return [];
-    }
-  }; //end of fetching show
-
-  useEffect(() => {
-    const loadData = async () => {
-      const moviesData = await getShows(moviesUrl);
-      const seriesData = await getShows(seriesUrl);
-
-      getMovies(
-        [...moviesData].sort(
-          (a, b) => Number(b.movieYear) - Number(a.movieYear),
-        ),
-      );
-      getSeries(
-        [...seriesData].sort(
-          (a, b) => Number(b.seriesYear) - Number(a.seriesYear),
-        ),
-      );
-    };
-
-    loadData();
-  }, []);
+  const { isSignedIn } = useAuth();
+  const imagesDownloaded = useMainStore((state: any)=> state.imagesDownloaded)
 
   return (
     <>
@@ -76,7 +27,7 @@ export default function TabLayout() {
           tabBarStyle: {
             position: "absolute",
             bottom: 10,
-            left:"5%",
+            left: "5%",
             right: "5%",
             backgroundColor: "transparent",
             borderTopWidth: 0,
@@ -88,14 +39,12 @@ export default function TabLayout() {
             overflow: "hidden",
           },
 
-          
           tabBarActiveTintColor: "white",
           tabBarAllowFontScaling: true,
           tabBarActiveBackgroundColor: "#2d96eb",
           tabBarInactiveTintColor: "white",
 
           tabBarItemStyle: {
-            
             backgroundColor: "rgba(0, 60, 80, 0.8)",
             height: 57,
           },
@@ -136,6 +85,7 @@ export default function TabLayout() {
             tabBarButton: (props: any) => (
               <TouchableOpacity
                 {...props}
+                disabled={!imagesDownloaded}
                 style={[
                   props.style,
                   {
@@ -160,6 +110,7 @@ export default function TabLayout() {
             tabBarButton: (props: any) => (
               <TouchableOpacity
                 {...props}
+                disabled={!imagesDownloaded}
                 style={[
                   props.style,
                   {
@@ -182,10 +133,9 @@ export default function TabLayout() {
               <Cog6ToothIcon color={color} size={focused ? 17 : 15} />
             ),
             tabBarButton: (props: any) => (
-              
               <TouchableOpacity
                 {...props}
-                disabled={!isSignedIn}
+                disabled={!isSignedIn || !imagesDownloaded}
                 style={[
                   props.style,
                   {

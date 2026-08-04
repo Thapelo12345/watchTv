@@ -7,7 +7,6 @@ import { PlayIcon } from "react-native-heroicons/solid";
 import CastSection from "@/components/castSection";
 import { ActivityIndicator } from "react-native";
 import { useState, useEffect } from "react";
-import { router } from "expo-router";
 import { useAuth } from "@clerk/expo";
 import { useMainStore } from "@/stateManagement/store";
 import { Play } from "@/utils/showInfo-util";
@@ -15,7 +14,12 @@ import { Alert } from "react-native";
 
 export default function Infor() {
   const selected_show = useMainStore((state: any) => state.selectedShow);
-  const { isLoaded , isSignedIn } = useAuth()
+  const { isLoaded, isSignedIn } = useAuth();
+
+  // store action states
+  const setCurrentlyPlaying = useMainStore(
+    (state: any) => state.setPlayingProgramme,
+  );
 
   const [season, setSeason] = useState("Season 1");
   const [episode, setEpisode] = useState("Episode 1");
@@ -82,13 +86,26 @@ export default function Infor() {
                   onPress={async () => {
                     if (AddingSeasonOnline || !isLoaded) return;
 
-                    if(!isSignedIn){
-                      Alert.alert("App Locked!.", "You must have an account To Watch shows!", [{text:"OK", onPress: ()=> console.log("Locked!")}])
-                      return
+                    if (!isSignedIn) {
+                      Alert.alert(
+                        "App Locked!.",
+                        "You must have an account To Watch shows!",
+                        [{ text: "OK", onPress: () => console.log("Locked!") }],
+                      );
+                      return;
                     }
 
                     setPlayLoader(true);
                     Play(selected_show, season, episode, setPlayLoader);
+
+                    selected_show.programmeType === "series"
+                      ? setCurrentlyPlaying({
+                          programmeName: selected_show.programme.seriesHeader,
+                          programmeSeason: { season, episode },
+                        })
+                      : setCurrentlyPlaying({
+                          programmeName: selected_show.programme.movieHeader,
+                        });
                   }}
                 >
                   <PlayIcon className="self-center" color="white" size={80} />

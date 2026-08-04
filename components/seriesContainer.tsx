@@ -41,7 +41,7 @@ export default function SeriesContainer({
           source={{ uri: imageUrl }}
           placeholder={require("../assets/images/series-defualt.png")}
           accessibilityLabel="Series image"
-          transition={200}
+          transition={300}
           contentFit="cover"
         />
 

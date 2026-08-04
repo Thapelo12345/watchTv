@@ -1,5 +1,4 @@
 import { View, Text, ActivityIndicator } from "react-native"
-import LoadingScreen from "./animations/loading";
 
 
 export function OnlineLoader(){

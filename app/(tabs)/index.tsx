@@ -1,4 +1,4 @@
-import { Text, View, Image, ActivityIndicator, ScrollView } from "react-native";
+import { Text, View, ActivityIndicator, ScrollView } from "react-native";
 import { useState, useEffect } from "react";
 import MarqeeComponent from "@/components/marqee";
 import { useMainStore } from "@/stateManagement/store";
@@ -6,30 +6,32 @@ import MediaScreen from "@/components/mediaPlayer";
 
 export default function Home() {
   
-  const movies = useMainStore((state: any) => state.movies);
-  const series = useMainStore((state: any) => state.series);
+  // store solid states here
+  const movies = useMainStore((state: any) => state.latestMovies);
+  const series = useMainStore((state: any) => state.latestSeries);
+  const imagesDownloaded = useMainStore((state: any)=> state.imagesDownloaded)
 
-  const [seriesImages, setSeriesImages] = useState<
-    { id: string; imageUrl: string }[]
-  >([]);
-
-  const [moviesImages, setMoviesImages] = useState<
-    { id: string; imageUrl: string }[]
-  >([]);
+  const [seriesImages, setSeriesImages] = useState<{ id: string; imageUrl: string }[]>([]);
+  const [moviesImages, setMoviesImages] = useState< { id: string; imageUrl: string }[]>([]);
 
   // getting mongodb data
   useEffect(() => {
-    setSeriesImages(
-      series.map((show: any) => {
-        return { id: show._id, imageUrl: show.seriesImageUrl };
-      }),
-    );
+    if(movies.length !== 0) {
+      setSeriesImages(
+        series.map((show: any) => {
+          return { id: show._id, imageUrl: show.seriesImageUrl };
+        }),
+      );
+    }
 
-    setMoviesImages(
-      movies.map((movie: any) => {
-        return { id: movie._id, imageUrl: movie.movieImageUrl };
-      }),
-    );
+    if(series.length !== 0) {
+      setMoviesImages(
+        movies.map((movie: any) => {
+          return { id: movie._id, imageUrl: movie.movieImageUrl };
+        }),
+      );
+    }
+    
   }, [movies, series]);
 
   return (
@@ -42,6 +44,7 @@ export default function Home() {
             <ActivityIndicator size="large" color="blue" />
           </View>
         ) : (
+          imagesDownloaded &&
           <MarqeeComponent
             linkText="Series"
             urlLink="/(tabs)/series"
@@ -53,7 +56,7 @@ export default function Home() {
           <View className="image-loader">
             <ActivityIndicator size="large" color="blue" />
           </View>
-        ) : (
+        ) : (imagesDownloaded &&
           <MarqeeComponent
             linkText="Movies"
             urlLink="/(tabs)/movies"

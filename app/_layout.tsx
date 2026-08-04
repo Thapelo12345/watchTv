@@ -44,16 +44,20 @@ const tokenCache = {
   },
 };
 
-// 1. Create your custom theme object
+
+
+export default function RootLayout() {
+
+  const Theme = useMainStore((state: any)=> state.theme)
+  // 1. Create your custom theme object
 const MyGlobalCustomTheme = {
   ...DarkTheme, // Base it on DarkTheme to automatically flip native system text defaults
   colors: {
     ...DarkTheme.colors,
-    background: "whitesmoke", // 👈 Change this to your exact global background hex color!
+    background: Theme === "light" ? "whitesmoke" : "#232325", 
   },
 };
 
-export default function RootLayout() {
   const [fontsLoaded] = useFonts({
     Lobster_400Regular,
     Lora_700Bold,
@@ -83,7 +87,7 @@ export default function RootLayout() {
       <ThemeProvider value={MyGlobalCustomTheme}>
         <SafeAreaProvider>
           <SafeAreaView
-            style={{ flex: 1, backgroundColor: "whitesmoke" }}
+            style={{ flex: 1, backgroundColor: Theme === "light" ? "whitesmoke" : "#232325" }}
             edges={showPlaying ? ["bottom"] : ["top", "bottom"]}
           >
             <GestureHandlerRootView className="flex-1">

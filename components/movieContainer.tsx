@@ -4,7 +4,7 @@ import { router } from "expo-router";
 import { StarIcon } from "react-native-heroicons/solid";
 import { useMainStore } from "@/stateManagement/store";
 import { showPosition } from "@/utils/search-utils";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 type PROPS = {
   program: any;
@@ -39,7 +39,7 @@ export default function MovieContainer({
           source={{ uri: imageUrl }}
           placeholder={require("../assets/images/movies-default.png")}
           accessibilityLabel="Movie image"
-          transition={200}
+          transition={300}
           contentFit="cover"
         />
 

@@ -8,12 +8,36 @@ import { useAuth } from "@clerk/expo";
 const mainUrl = (useMainStore.getState() as { baseUrl: string }).baseUrl;
 
 // store function states here
-const initializeCurrentUser = (
-  userStore.getState() as { initializeUser: (value: any) => void }
-).initializeUser;
-const verifiedUserHasData = (
-  userStore.getState() as { setUserInitialized: (value: boolean) => void }
-).setUserInitialized;
+const initializeCurrentUser = (userStore.getState() as { initializeUser: (value: any) => void }).initializeUser;
+const verifiedUserHasData = (userStore.getState() as { setUserInitialized: (value: boolean) => void }).setUserInitialized;
+
+const getMovies = (useMainStore.getState() as { getMovies: (value: any) => void }).getMovies;
+const getSeries = (useMainStore.getState() as { getSeries: (value: any) => void }).getSeries;
+
+const getLatestMovies = (useMainStore.getState() as { addLatestMovie: (value: any) => void }).addLatestMovie;
+const getLatestSeries = (useMainStore.getState() as { addLatestSeries: (value: any) => void }).addLatestSeries;
+
+ const getShows = async (showUrl: string) => {
+    try {
+      const response = await fetch(showUrl, { method: "GET" });
+
+      if (!response.ok) throw new Error("Failed to retch server!..");
+
+      if (response.status !== 200) {
+        alert("Failed to get data from server!.");
+        return [];
+      }
+
+      // 2. FIXED: Added 'await' before response.json()
+      const showData: any = await response.json();
+      return showData.data;
+    } catch (err: unknown) {
+      const errMessage =
+        err instanceof Error ? err.message : "unknown server error!..";
+      console.error("Network Fetch Error: ", errMessage);
+      return [];
+    }
+}; //end of fetching show
 
 function extractUserInfo(data: any){
   return {
@@ -61,4 +85,45 @@ async function getCloudUser(id: string) {
   }
 } //end of get cloud use r function
 
-export { getCloudUser, extractUserInfo}
+async function getAllPrommes() {
+  // get all movies ,series and latest movies and series
+  const allMovies = await getShows(`${mainUrl}/movies/programs`);
+  const allSeries = await getShows(`${mainUrl}/series/programs`);
+
+  getMovies([...allMovies].sort((a, b) => Number(b.movieYear) - Number(a.movieYear)));
+  getSeries([...allSeries].sort((a, b) => b.lastUpdate.localeCompare(a.lastUpdate)));
+}//
+
+async function getLatestProgrames(){
+  // first update series data base
+  const movies = (useMainStore.getState() as {movies: any[]}).movies;
+  const series = (useMainStore.getState() as {series: any[]}).series;
+
+  // try{
+
+  //   const serieUpdateResponse = await fetch(`${mainUrl}/series/lastDate`, { method: "GET" });
+
+  //   if(!serieUpdateResponse.ok) throw new Error("Failed to update series data!.")
+
+  //     const data = await serieUpdateResponse.json();
+
+  //     if(data.message !== "All Data Updated Successfully!.") throw new Error("Failed to update series data!.")
+  // }
+  // catch(err: unknown){
+  //   const errMessage = err instanceof Error ? err.message : "unknown error";
+  //   console.error("Error in getting latest programes\n", errMessage);
+  // }
+
+  let tempMovie: any[] = [];
+  let tempSeries: any[] = [];
+
+      for (let i = 0; i < 10; i++) {
+        tempMovie.push(movies[i]);
+        tempSeries.push(series[i]);
+      } //end of 4 loop
+
+  getLatestMovies(tempMovie);
+  getLatestSeries(tempSeries);
+}
+
+export { getCloudUser, extractUserInfo, getAllPrommes, getLatestProgrames };
