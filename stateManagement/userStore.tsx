@@ -57,7 +57,6 @@ type SEASON = {season: string;  episode: string;}
     userPrefferedGenres: [],
     userInitialized: false,
     // store functions
-   // 3. Fixed syntax: Added parentheses around the returned object code context
     initializeUser: (userData: any) => set((state: any) => ({
       ...state,
       ...userData,
@@ -89,12 +88,15 @@ type SEASON = {season: string;  episode: string;}
       userMovies: [...state.userLiked.userMovies, likedMovie]
     }
   })),
-    removeLikedSeries: (removeShow: string) => set((state: any) => ({
-    userLiked: {
-      ...state.userLiked,
-      userSeries: state.userLiked.userSeries.filter((showName: string) => showName !== removeShow)
-    }
-  })),
+   removeLikedSeries: (removeShow: string) => set((state: any) => ({
+  ...state, // 1. Copy the entire root level state first
+  userLiked: {
+    ...state.userLiked, // 2. Copy the inner userLiked object layers
+    userSeries: state.userLiked.userSeries.filter(
+      (showName: string) => showName.trim() !== removeShow.trim()
+    ) // 3. Filter out the matching show name safely
+  }
+})),
   removeLikedMovies: (removeShow: string) => set((state: any) => ({
     userLiked: {
       ...state.userLiked,

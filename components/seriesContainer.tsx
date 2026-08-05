@@ -4,6 +4,7 @@ import { router } from "expo-router";
 import { StarIcon } from "react-native-heroicons/solid";
 import { useMainStore } from "@/stateManagement/store";
 import { showPosition } from "@/utils/search-utils";
+import { useTheme } from "@/constants/myTheme";
 import { useEffect } from "react";
 
 type PROPS = {
@@ -21,6 +22,8 @@ export default function SeriesContainer({
   rate,
   imageUrl,
 }: PROPS) {
+
+  const theme = useTheme()
   const setShow = useMainStore((state: any) => state.set_selected_show);
   const savePosition = useMainStore((state: any) => state.getSelectedPosition);
 
@@ -35,7 +38,12 @@ export default function SeriesContainer({
         router.navigate("../showInfo");
       }}
     >
-      <View className="card">
+      <View className="card"
+      style={{
+        backgroundColor: theme.cardBackground,
+        boxShadow: theme.cardShadow
+      }}
+      >
         <Image
           style={{ width: "100%", height: 160, backgroundColor: "#eee" }}
           source={{ uri: imageUrl }}
@@ -46,13 +54,25 @@ export default function SeriesContainer({
         />
 
         <View className="mx-2">
-          <Text numberOfLines={1} className="font-lora font-extrabold truncate">
+          <Text numberOfLines={1} className="font-lora font-extrabold truncate"
+          style={{
+            color: theme.text
+          }}
+          >
             {title}
           </Text>
-          <Text>
+          <Text
+          style={{
+            color: theme.text
+          }}
+          >
             <StarIcon color="gold" size={10} /> {rate}
           </Text>
-          <Text> {seriesYear}</Text>
+          <Text
+          style={{
+            color: theme.text
+          }}
+          > {seriesYear}</Text>
         </View>
       </View>
     </Pressable>

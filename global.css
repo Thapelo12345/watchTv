@@ -1,93 +1,93 @@
 @import "tailwindcss/theme.css" layer(theme);
 @import "tailwindcss/preflight.css" layer(base);
 @import "tailwindcss/utilities.css";
- 
+
 @import "nativewind/theme";
 
 @theme {
-
-    /* Define Theme colors */
-    --backgraound: "#FFFDD0";
-    --color-foreground: "#60A5FA";
-    
   /* Define your custom font family utility class */
-    --font-lobster: "Lobster_400Regular";
-    --font-lora: "Lora_400Regular"
+  --font-lobster: "Lobster_400Regular";
+  --font-lora: "Lora_400Regular";
 }
 @layer components {
 
-    .auth-btn{
-        @apply text-lg font-lora text-white border-2 border-white p-0.5 px-4 rounded-lg;
-    }
+  .view-show-btn {
+    @apply flex flex-row gap-2;
+  }
+.auth-btn {
+    @apply text-lg font-lora text-white border-2 border-white p-0.5 px-4 rounded-lg;
+  }
 
-    .form-btn{
-        @apply border border-white p-2 px-4 m-2 mx-4 text-lg rounded-lg bg-blue-400 text-white;
-        box-shadow: inset 2px 2px 3px white, 1px 1px 2px black;
-        text-shadow: 1px 1px 2px black;
-    }
-    .page-containers{
-        @apply flex flex-col items-center justify-evenly;
-    }
-    .pageHeaders {
-        @apply text-white shadow-2xl shadow-black w-fit font-lobster bg-blue-400 text-2xl text-center p-2 px-6 rounded-lg mb-2 mt-5;
-        box-shadow: inset 3px 3px 5px white, 2px 4px 7px black;
-        text-shadow: 1px 1px 2px black;
-    }
+  .form-btn {
+    @apply border border-white p-2 px-4 m-2 mx-4 text-lg rounded-lg bg-blue-400 text-white;
+    box-shadow:
+      inset 2px 2px 3px white,
+      1px 1px 2px black;
+    text-shadow: 1px 1px 2px black;
+  }
+  .page-containers {
+    @apply flex flex-col items-center justify-evenly;
+  }
+  .pageHeaders {
+    @apply text-white shadow-2xl shadow-black w-fit font-lobster bg-blue-400 text-2xl text-center p-2 px-6 rounded-lg mb-2 mt-5;
+    box-shadow:
+      inset 3px 3px 5px white,
+      2px 4px 7px black;
+    text-shadow: 1px 1px 2px black;
+  }
 
-    .input-text {
-        @apply flex-1 border-2 text-white  border-white bg-blue-300  m-1 p-2 truncate h-fit rounded-lg overflow-hidden ;
-        box-shadow: inset 1px 2px 5px black, 1px 1px 4px white, 1px 1px 4px black;
-    }
-    
-    .image-shadow{
-        box-shadow: inset 1px 2px 5px black, 1px 1px 4px white, 1px 1px 4px black;
-    }
+  .input-text {
+    @apply flex-1 border-2 text-white  border-white bg-blue-300  m-1 p-2 truncate h-fit rounded-lg overflow-hidden;
+    box-shadow:
+      inset 1px 2px 5px black,
+      1px 1px 4px white,
+      1px 1px 4px black;
+  }
 
-    .image-loader{
-        @apply flex items-center justify-center m-2 w-full h-80;
-    }
+  .image-shadow {
+    box-shadow:
+      inset 1px 2px 5px black,
+      1px 1px 4px white,
+      1px 1px 4px black;
+  }
 
-    .media-btn-container{
-        @apply flex flex-row items-start justify-evenly p-2 mx-4 px-4 border-2 border-white rounded-2xl;
-    }
-    .media-btn{
-        @apply text-white text-2xl bg-black/50 mx-2;
-        text-shadow: 1px 1px 3px black;
-    }
+  .image-loader {
+    @apply flex items-center justify-center m-2 w-full h-80;
+  }
 
-    .card{
-        @apply bg-white m-1 w-35 overflow-hidden rounded-lg;
-        box-shadow: 1px 7px 8px white, 1px 2px 6px black;
-    }
+  .media-btn-container {
+    @apply flex flex-row items-start justify-evenly p-2 mx-4 px-4 border-2 border-white rounded-2xl;
+  }
+  .media-btn {
+    @apply text-white text-2xl bg-black/50 mx-2;
+    text-shadow: 1px 1px 3px black;
+  }
 
-    .cast-card{
-        @apply bg-[--foreground] items-center w-45 h-75 m-3 p-2 pb-10 rounded-md;
-        box-shadow: -2px -2px 5px white, -2px -2px 4px black;
-    }
+  .card {
+    @apply m-1 w-35 overflow-hidden rounded-lg;
+  }
 
-    .search-container{
-        box-shadow: 1px 1px 1px black, 2px 2px 6px white;
-    }
+  .cast-card {
+    @apply items-center w-45 h-75 m-3 p-2 pb-10 rounded-md;
+  }
 
-    .search-input{
-        @apply mx-2 px-2 w-[60%];
-    }
+  .search-input {
+    @apply mx-2 px-2 w-[60%];
+  }
 
-    .search-btn{
-        @apply m-2 bg-blue-200 p-2 rounded-lg;
-    }
+  .search-btn {
+    @apply m-2 bg-blue-200 p-2 rounded-lg;
+  }
 
-    .series-btn{
-        @apply border-2 border-white p-2 px-8 text-lg m-2 rounded-lg;
-    }
+  .series-btn {
+    @apply border-2 border-white p-2 px-8 text-lg m-2 rounded-lg;
+  }
 
-    .selected{
-        @apply text-white font-lora font-extrabold;
-    }
+  .selected {
+    @apply text-white font-lora font-extrabold;
+  }
 
-    .scroll-items{
-     @apply text-white text-2xl font-lora w-fit font-extrabold bg-blue-500 p-2 m-1 rounded-lg;
-    }
-   
-
+  .scroll-items {
+    @apply text-white text-2xl font-lora w-fit font-extrabold bg-blue-500 p-2 m-1 rounded-lg;
+  }
 }

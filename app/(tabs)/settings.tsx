@@ -7,6 +7,7 @@ import { useColorScheme } from "react-native";
 import { Appearance } from 'react-native';
 
 export default function Settings() {
+
   const Theme = useColorScheme()
   const [isEnabled, setEnable] = useState(true)
 
@@ -23,7 +24,8 @@ export default function Settings() {
           ios_backgroundColor="#3e3e3e"
           onValueChange={()=>{
             setEnable(!isEnabled)
-            Appearance.setColorScheme(Theme === "dark" ? 'light' : 'dark')
+            const currentTheme = Appearance.getColorScheme(); 
+            Appearance.setColorScheme(currentTheme === "dark" ? 'light' : 'dark');
           }}
           value={isEnabled}
         />

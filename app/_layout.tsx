@@ -16,6 +16,7 @@ import { Lora_700Bold } from "@expo-google-fonts/lora";
 import Auth from "@/components/authComponent";
 import { AuthView } from "@clerk/expo/native";
 import * as WebBrowser from "expo-web-browser";
+import { useTheme } from "@/constants/myTheme";
 import "../global.css";
 
 WebBrowser.maybeCompleteAuthSession();
@@ -44,17 +45,15 @@ const tokenCache = {
   },
 };
 
-
-
 export default function RootLayout() {
 
-  const Theme = useMainStore((state: any)=> state.theme)
+  const theme = useTheme()
   // 1. Create your custom theme object
 const MyGlobalCustomTheme = {
   ...DarkTheme, // Base it on DarkTheme to automatically flip native system text defaults
   colors: {
     ...DarkTheme.colors,
-    background: Theme === "light" ? "whitesmoke" : "#232325", 
+    background: theme.background
   },
 };
 
@@ -87,7 +86,7 @@ const MyGlobalCustomTheme = {
       <ThemeProvider value={MyGlobalCustomTheme}>
         <SafeAreaProvider>
           <SafeAreaView
-            style={{ flex: 1, backgroundColor: Theme === "light" ? "whitesmoke" : "#232325" }}
+            style={{ flex: 1, backgroundColor: theme.background }}
             edges={showPlaying ? ["bottom"] : ["top", "bottom"]}
           >
             <GestureHandlerRootView className="flex-1">
@@ -100,7 +99,7 @@ const MyGlobalCustomTheme = {
               <Stack
                 screenOptions={{
                   headerShown: false,
-                  contentStyle: { backgroundColor: "whitesmoke" },
+                  contentStyle: { backgroundColor: theme.background  },
                 }}
               />
 

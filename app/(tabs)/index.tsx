@@ -1,4 +1,5 @@
 import { Text, View, ActivityIndicator, ScrollView } from "react-native";
+import { useColorScheme } from "react-native";
 import { useState, useEffect } from "react";
 import MarqeeComponent from "@/components/marqee";
 import { useMainStore } from "@/stateManagement/store";

@@ -118,7 +118,7 @@ export default function Auth({ openCloseClerk }: PROP) {
 
   return (
     <View
-      className={`${mediaFilePlaying ? "hidden" : "visible"} flex flex-row items-center justify-end w-[99%] mx-0.5 rounded-lg gap-x-4 bg-foreground h-14 p-2`}
+      className={`${mediaFilePlaying ? "hidden" : "visible"} flex flex-row items-center justify-end w-[99%] mx-0.5 rounded-lg gap-x-4 bg-blue-400 h-14 p-2`}
     >
       {isSignedIn && (
         <Text className="text-white mr-11 text-[17px] font-extrabold">

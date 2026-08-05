@@ -1,25 +1,32 @@
-import { View, Text, ScrollView, Pressable } from "react-native";
+import { View, Text, ScrollView, Pressable, ActivityIndicator } from "react-native";
 import { ImageBackground } from "expo-image";
 import "react-native-get-random-values";
 import { BlurView } from "expo-blur";
 import SelectComponent from "@/components/selector";
-import { PlayIcon } from "react-native-heroicons/solid";
+import { PlayIcon, HeartIcon } from "react-native-heroicons/solid";
 import CastSection from "@/components/castSection";
-import { ActivityIndicator } from "react-native";
 import { useState, useEffect } from "react";
 import { useAuth } from "@clerk/expo";
 import { useMainStore } from "@/stateManagement/store";
-import { Play } from "@/utils/showInfo-util";
+import { userStore } from "@/stateManagement/userStore";
+import { Play, upDateLickedShows } from "@/utils/showInfo-util";
 import { Alert } from "react-native";
+// import HeartOutlineIcon from "react-native-heroicons/outline/HeartIcon";
+import { HeartIcon as HeartOutlineIcon } from "react-native-heroicons/outline";
+import { useTheme } from "@/constants/myTheme";
 
 export default function Infor() {
+
+  const theme = useTheme()
+
   const selected_show = useMainStore((state: any) => state.selectedShow);
   const { isLoaded, isSignedIn } = useAuth();
 
+  // store solid state 
+  const lickedProgrammes = userStore((state: any) => state.userLiked);
+
   // store action states
-  const setCurrentlyPlaying = useMainStore(
-    (state: any) => state.setPlayingProgramme,
-  );
+  const setCurrentlyPlaying = useMainStore((state: any) => state.setPlayingProgramme);
 
   const [season, setSeason] = useState("Season 1");
   const [episode, setEpisode] = useState("Episode 1");
@@ -27,22 +34,20 @@ export default function Infor() {
   const [AddingSeasonOnline, setAddingSeason] = useState(false);
   const [playLoader, setPlayLoader] = useState(false);
   const [showLanguage, setShowLanguage] = useState("Not specified!.");
+  const [likedShow, setLikedShow] = useState(false);
+  const [load, setLoad] = useState(false)
 
-  const pendingSeasons =
-    selected_show?.programmeType == "series"
-      ? (selected_show?.programme?.pendingSeasons?.length || 0) !== 0
-      : false;
-
-  const genres =
-    selected_show?.programme?.movieGenres ||
-    selected_show?.programme?.seriesGenres ||
-    [];
-  const actors =
-    selected_show?.programme?.movieCast ||
-    selected_show?.programme?.seriesCast ||
-    [];
+  const pendingSeasons = selected_show?.programmeType == "series" ? (selected_show?.programme?.pendingSeasons?.length || 0) !== 0 : false;
+  const genres = selected_show?.programme?.movieGenres || selected_show?.programme?.seriesGenres || [];
+  const actors = selected_show?.programme?.movieCast || selected_show?.programme?.seriesCast || [];
 
   useEffect(() => {
+
+    // checking is the user licked the current show or not and setting the state accordingly
+    setLikedShow(
+     selected_show.programmeType === "series" ? lickedProgrammes.userSeries.includes(selected_show.programme.seriesHeader) :
+      lickedProgrammes.userMovies.includes(selected_show.programme.movieHeader) 
+    )
     setShowHeader(selected_show.programme.seriesHeader);
     const mainLanguage =
       selected_show.programme.seriesLanguage ||
@@ -56,26 +61,23 @@ export default function Infor() {
     )
       setShowLanguage("NOT SPECIFIED");
     else setShowLanguage(mainLanguage);
-  }, [selected_show]);
+  }, [selected_show, lickedProgrammes]);
 
   return (
-    <View className="w-screen h-screen pb-10">
+    <View className="w-screen h-screen pb-10"
+    style={{
+      backgroundColor: theme.background
+    }}
+    >
       <Text className="text-4xl font-lobster underline underline-offset-2 text-green-600 text-center m-2">
-        {selected_show.programmeType == "series"
-          ? selected_show.programme.seriesHeader
-          : selected_show.programme.movieHeader}
+        {selected_show.programmeType == "series" ? selected_show.programme.seriesHeader : selected_show.programme.movieHeader}
       </Text>
 
       <ScrollView>
         <View>
           <ImageBackground
             className="items-center h-170 w-full relative"
-            source={{
-              uri:
-                selected_show.programmeType === "series"
-                  ? selected_show.programme.seriesImageUrl
-                  : selected_show.programme.movieImageUrl,
-            }}
+            source={{uri: selected_show.programmeType === "series" ? selected_show.programme.seriesImageUrl : selected_show.programme.movieImageUrl }}
             transition={200} // Fast-fade transition will now work perfectly here!
             contentFit="cover" // Equivalent to resizeMode
           >
@@ -122,12 +124,22 @@ export default function Infor() {
             >
               {/* Langauge display Text */}
 
+              {!load ? (<View className="flex flex-row justify-between h-fit mb-4 w-full">
               <View className="flex flex-row">
                 <Text className="text-white font-lora text-2xl">Langauge:</Text>
                 <Text className="bg-green-500 text-2xl text-white mx-4 p-1 font-lora px-4 font-extrabold rounded-lg truncate">
                   {showLanguage}
-                </Text>
+                </Text> 
               </View>
+
+              <Pressable
+              className="mr-10"
+              onPress={()=>upDateLickedShows(setLoad, likedShow, selected_show)}
+              >
+                {likedShow ? <HeartIcon color="white" size={30} /> : <HeartOutlineIcon color="white" size={30} />}
+              </Pressable>
+              </View>) : (<ActivityIndicator color="skyBlue" size="large" />)}
+
 
               {/* Genres section */}
               <View className="flex flex-row w-full">
@@ -160,13 +172,13 @@ export default function Infor() {
           </ImageBackground>
         </View>
 
-        <Text className="text-4xl text-green-600 underline underline-offset-2 font-lobster text-center">
-          Description
-        </Text>
-        <Text className="p-2 text-base font-lora text-center leading-relaxed">
-          {selected_show.pogrameType === "series"
-            ? selected_show.programme.seriesDescription
-            : selected_show.programme.movieDescription}
+        <Text className="text-4xl text-green-600 underline underline-offset-2 font-lobster text-center">Description</Text>
+        <Text className="p-2 text-base font-lora text-center leading-relaxed"
+        style={{
+          color: theme.text
+        }}
+        >
+          {selected_show.pogrameType === "series" ? selected_show.programme.seriesDescription : selected_show.programme.movieDescription}
         </Text>
 
         {/* Cast items here */}

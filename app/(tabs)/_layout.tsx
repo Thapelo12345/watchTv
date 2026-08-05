@@ -22,7 +22,6 @@ export default function TabLayout() {
       <Tabs
         screenOptions={{
           headerShown: false,
-
           // main bar
           tabBarStyle: {
             position: "absolute",
@@ -36,12 +35,11 @@ export default function TabLayout() {
             width: 400,
             height: 60,
             margin: 10,
-            overflow: "hidden",
           },
 
-          tabBarActiveTintColor: "white",
+          tabBarActiveTintColor: "cyan",
           tabBarAllowFontScaling: true,
-          tabBarActiveBackgroundColor: "#2d96eb",
+          // tabBarActiveBackgroundColor: "94BAF4",
           tabBarInactiveTintColor: "white",
 
           tabBarItemStyle: {
@@ -66,7 +64,6 @@ export default function TabLayout() {
                   {
                     borderRadius: 50,
                     width: 60,
-                    overflow: "hidden",
                   },
                 ]}
                 activeOpacity={0.7}
@@ -91,7 +88,6 @@ export default function TabLayout() {
                   {
                     borderRadius: 50,
                     width: 60,
-                    overflow: "hidden",
                   },
                 ]}
                 activeOpacity={0.7}
@@ -116,7 +112,6 @@ export default function TabLayout() {
                   {
                     borderRadius: 50,
                     width: 60,
-                    overflow: "hidden",
                   },
                 ]}
                 activeOpacity={0.7}
@@ -141,7 +136,6 @@ export default function TabLayout() {
                   {
                     borderRadius: 50,
                     width: 50,
-                    overflow: "hidden",
                   },
                 ]}
                 activeOpacity={0.7}

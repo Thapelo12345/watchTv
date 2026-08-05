@@ -9,8 +9,11 @@ import ImageUpdate from "./imageUpdate";
 import { getImageLocation, updateCloud, uploadToImageKit } from "@/utils/update-utils";
 import { userStore } from "@/stateManagement/userStore";
 import { useState, useRef, useEffect } from "react";
+import { useTheme } from "@/constants/myTheme";
 
 export default function UpdateUserInfor() {
+
+  const theme = useTheme()
   // store states here
   const userProfile = userStore((state: any) => state.profilePicture);
   const currentUser = userStore((state: any) => state.userName);
@@ -41,6 +44,10 @@ export default function UpdateUserInfor() {
         className="p-2 m-2 text-black rounded-lg border-4 border-white w-full shadow-lg"
         value={inputName}
         onChangeText={(text) => setInputName(text)}
+        style={{
+          color: theme.text,
+          boxShadow: theme.settingsShadow
+        }}
       />
 
       {load ? (
@@ -63,7 +70,12 @@ export default function UpdateUserInfor() {
         }
           }
         >
-          <Text className="p-2 border-4 border-white m-4 rounded-lg shadow-lg">
+          <Text className="p-2 border-4 border-white m-4 rounded-lg"
+          style={{
+          color: theme.text,
+          boxShadow: theme.settingsShadow
+        }}
+          >
             Update
           </Text>
         </Pressable>

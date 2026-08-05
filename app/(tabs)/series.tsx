@@ -5,6 +5,7 @@ import { OnlineLoader } from "@/components/onlineLoader";
 import { useMainStore } from "@/stateManagement/store";
 import { usePathname } from 'expo-router';
 import { useEffect } from "react";
+import ViewShows from "@/components/ui/userView";
 
 // 1. Create a memoized item component outside the main function
 const SeriesItem = React.memo(({ item }: { item: any }) => {
@@ -46,11 +47,8 @@ export default function Series() {
 
   return (
     <View className="page-containers">
-      <Text
-        className="pageHeaders font-lobster"
-      >
-        Series
-      </Text>
+      <Text className="pageHeaders font-lobster">Series</Text>
+      <ViewShows />
 
       {
        onlineSearchOn ?

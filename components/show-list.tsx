@@ -4,6 +4,7 @@ import ListItem from "./ui/list-item";
 import { useContext, useState } from "react";
 import { lickedModal } from "@/Content/listContent";
 import { Alert } from "react-native";
+import { useTheme } from "@/constants/myTheme";
 
 type PROPS = {
   ActionIcon: React.ComponentType<{ color?: string; size?: number }>;
@@ -12,11 +13,17 @@ type PROPS = {
 };
 
 export default function ShowList({ActionIcon,  listName, listArray }: PROPS) {
+
+  const theme = useTheme()
   const { modalOpen, setModal } = useContext(lickedModal);
   const [openModal, setOpenModal] = useState(false);
 
   return (
-    <View className="border-4 w-[50%] border-white m-2 p-2 shadow-lg rounded-lg">
+    <View className="border-4 w-[50%] border-white m-2 p-2 shadow-lg rounded-lg"
+    style={{
+      boxShadow: theme.settingsShadow
+    }}
+    >
       <Pressable
         className="flex flex-row gap-2"
         onPress={() => {
@@ -32,7 +39,11 @@ export default function ShowList({ActionIcon,  listName, listArray }: PROPS) {
         }}
       >
         <ActionIcon color="#60a5fa" size={20} />
-        <Text className="text-center">{listName}</Text>
+        <Text className="text-center"
+        style={{
+          color: theme.text
+        }}
+        >{listName}</Text>
       </Pressable>
 
       <View
