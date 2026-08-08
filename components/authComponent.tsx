@@ -6,7 +6,7 @@ import { useAuth, useUser } from "@clerk/expo";
 import { UserCircleIcon } from "react-native-heroicons/solid";
 import { useMainStore } from "@/stateManagement/store";
 import { userStore } from "@/stateManagement/userStore";
-import { getCloudUser, extractUserInfo, getAllPrommes, getLatestProgrames } from "@/utils/auth-utils";
+import { getCloudUser, extractUserInfo, getAllProgrammes, getLatestProgrames } from "@/utils/auth-utils";
 import { useEffect, useRef } from "react";
 
 type PROP = {
@@ -103,7 +103,7 @@ export default function Auth({ openCloseClerk }: PROP) {
   // programe useEffect to get the latest programes from the server and update the store
   useEffect(() => {
 
-    if(allMovies.length === 0 && allSeries.length === 0) getAllPrommes();
+    if(allMovies.length === 0 && allSeries.length === 0) getAllProgrammes();
     if(allMovies.length !== 0 && allSeries.length !== 0) getLatestProgrames();
  
   }, [allMovies, allSeries]);

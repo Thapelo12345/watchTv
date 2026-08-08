@@ -108,12 +108,16 @@ const history = (userStore.getState() as {watchHistory: string[]}).watchHistory
 
       removeUnfinishedShows(itemName);
     }
+
+    return "deleted Successfully"
   } catch (err: unknown) {
     const errMessage =
       err instanceof Error ? err.message : "unknown server error!.";
-
     Alert.alert("SERVER ERROR!.", errMessage, [
-      { text: "OK", onPress: () => console.log(errMessage) },
+      { text: "OK", onPress: () => {
+        console.log(errMessage)
+        return "Failed to Delete"
+      } },
     ]);
   }
 } //end of delete item functions

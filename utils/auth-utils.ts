@@ -85,10 +85,11 @@ async function getCloudUser(id: string) {
   }
 } //end of get cloud use r function
 
-async function getAllPrommes() {
+async function getAllProgrammes() {
   // get all movies ,series and latest movies and series
   const allMovies = await getShows(`${mainUrl}/movies/programs`);
   const allSeries = await getShows(`${mainUrl}/series/programs`);
+
 
   getMovies([...allMovies].sort((a, b) => Number(b.movieYear) - Number(a.movieYear)));
   getSeries([...allSeries].sort((a, b) => b.lastUpdate.localeCompare(a.lastUpdate)));
@@ -126,4 +127,4 @@ async function getLatestProgrames(){
   getLatestSeries(tempSeries);
 }
 
-export { getCloudUser, extractUserInfo, getAllPrommes, getLatestProgrames };
+export { getCloudUser, extractUserInfo, getAllProgrammes, getLatestProgrames };

@@ -4,8 +4,11 @@ import SeriesContainer from "@/components/seriesContainer";
 import { OnlineLoader } from "@/components/onlineLoader";
 import { useMainStore } from "@/stateManagement/store";
 import { usePathname } from 'expo-router';
-import { useEffect } from "react";
+import { useEffect, useState, useRef } from "react";
 import ViewShows from "@/components/ui/userView";
+import { userStore } from "@/stateManagement/userStore";
+import { useShallow } from 'zustand/react/shallow';
+import { useTheme } from "@/constants/myTheme";
 
 // 1. Create a memoized item component outside the main function
 const SeriesItem = React.memo(({ item }: { item: any }) => {
@@ -27,11 +30,18 @@ const SeriesItem = React.memo(({ item }: { item: any }) => {
 
 export default function Series() {
 
+  const theme = useTheme()
+  
+  const extractLikedShows = useRef([])
+  const [displayShows, setDisplayShow] = useState([])
+
   const renderItem = React.useCallback(({ item }: any) => (
       <SeriesItem item={item} />
     ), []);
     
   const series = useMainStore((state: any) => state.series);
+  const likedSeriesNames = userStore(useShallow((state: any) => state.userLiked.userSeries));
+  const onView = userStore((state: any)=> state.userPrefferendView)
   
   const switchSearch = useMainStore((state: any)=> state.setSearching)
 
@@ -45,6 +55,15 @@ export default function Series() {
     if(searchOn && pathname !== "/series") switchSearch()
   }, [pathname])
 
+  useEffect(()=>{extractLikedShows.current = series.filter((series: any)=> likedSeriesNames.includes(series.seriesHeader))
+  },[likedSeriesNames])
+
+  useEffect(()=>{
+    onView === "all" ? 
+    setDisplayShow(series) :
+    setDisplayShow(extractLikedShows.current)
+  }, [onView])
+
   return (
     <View className="page-containers">
       <Text className="pageHeaders font-lobster">Series</Text>
@@ -54,6 +73,7 @@ export default function Series() {
        onlineSearchOn ?
        (<OnlineLoader />) :
 
+       displayShows.length !== 0 ?
       (<FlatList
         key={3}
         contentContainerClassName="pb-20"
@@ -62,10 +82,18 @@ export default function Series() {
         maxToRenderPerBatch={10}
         windowSize={5}
         removeClippedSubviews={true}
-        data={(pathname == "/series" && searchOn) ? searchedSeries : series}
+        data={(pathname == "/series" && searchOn) ? searchedSeries : displayShows}
         renderItem={renderItem}
         keyExtractor={(item) => item._id}
-      />)}
+      />) :
+      (
+
+      <Text
+      className="mt-50"
+      style={{color: theme.text}}
+      >No user Data</Text>)
+    
+    }
     </View>
   );
 }

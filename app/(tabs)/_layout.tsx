@@ -8,11 +8,12 @@ import {
 } from "react-native-heroicons/solid";
 import SearchComponent from "@/components/searchComponent";
 import { useMainStore } from "@/stateManagement/store";
-import { useEffect } from "react";
 import { useAuth } from "@clerk/expo";
 
 export default function TabLayout() {
   const { isSignedIn } = useAuth();
+
+  const onlineSearchOn = useMainStore((state: any) => state.onlineSearch);
   const imagesDownloaded = useMainStore((state: any)=> state.imagesDownloaded)
 
   return (
@@ -59,12 +60,10 @@ export default function TabLayout() {
             tabBarButton: (props: any) => (
               <TouchableOpacity
                 {...props}
+                disabled={onlineSearchOn}
                 style={[
                   props.style,
-                  {
-                    borderRadius: 50,
-                    width: 60,
-                  },
+                  {borderRadius: 50,width: 60,},
                 ]}
                 activeOpacity={0.7}
               />
@@ -82,7 +81,7 @@ export default function TabLayout() {
             tabBarButton: (props: any) => (
               <TouchableOpacity
                 {...props}
-                disabled={!imagesDownloaded}
+                disabled={!imagesDownloaded || onlineSearchOn}
                 style={[
                   props.style,
                   {
@@ -106,7 +105,7 @@ export default function TabLayout() {
             tabBarButton: (props: any) => (
               <TouchableOpacity
                 {...props}
-                disabled={!imagesDownloaded}
+                disabled={!imagesDownloaded || onlineSearchOn}
                 style={[
                   props.style,
                   {
@@ -130,7 +129,7 @@ export default function TabLayout() {
             tabBarButton: (props: any) => (
               <TouchableOpacity
                 {...props}
-                disabled={!isSignedIn || !imagesDownloaded}
+                disabled={!isSignedIn || !imagesDownloaded || onlineSearchOn}
                 style={[
                   props.style,
                   {

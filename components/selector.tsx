@@ -127,7 +127,7 @@ export default function SelectComponent({
               }
 
               const seasonData = await response.json();
-              if (seasonData.message == "Failed to add season!..") {
+              if (seasonData.message === "Failed to add season!..") {
                 Alert.alert("SEARCH RESULTS", "could get the next season!...", [
                   { text: "OK", onPress: () => setaddingSeason(false) },
                 ]);
