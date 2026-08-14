@@ -1,9 +1,5 @@
 import { ClerkProvider } from "@clerk/expo";
-import {
-  DarkTheme,
-  DefaultTheme,
-  ThemeProvider,
-} from "@react-navigation/native";
+import { DarkTheme, ThemeProvider } from "@react-navigation/native";
 import * as SecureStore from "expo-secure-store";
 import { Stack } from "expo-router";
 import { Text, Modal } from "react-native";
@@ -17,6 +13,7 @@ import Auth from "@/components/authComponent";
 import { AuthView } from "@clerk/expo/native";
 import * as WebBrowser from "expo-web-browser";
 import { useTheme } from "@/constants/myTheme";
+import UpdateComponent from "@/components/updateComponent";
 import "../global.css";
 
 WebBrowser.maybeCompleteAuthSession();
@@ -86,7 +83,7 @@ const MyGlobalCustomTheme = {
       <ThemeProvider value={MyGlobalCustomTheme}>
         <SafeAreaProvider>
           <SafeAreaView
-            style={{ flex: 1, backgroundColor: theme.background }}
+            style={{ position: "relative", flex: 1, backgroundColor: theme.background }}
             edges={showPlaying ? ["bottom"] : ["top", "bottom"]}
           >
             <GestureHandlerRootView className="flex-1">
@@ -114,6 +111,8 @@ const MyGlobalCustomTheme = {
                   onDismiss={() => setOpenclerk(false)}
                 />
               </Modal>
+
+              <UpdateComponent />
             </GestureHandlerRootView>
           </SafeAreaView>
         </SafeAreaProvider>

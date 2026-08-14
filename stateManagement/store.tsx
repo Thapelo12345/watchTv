@@ -21,6 +21,10 @@ type STORETYPES = {
     programmeName: string;
     programmeSeason?:SEASON;
   };
+  appUpdating: boolean;
+  appUpdateMessage: string;
+  setAppUpdate:(value: boolean)=> void;
+  setAppUpdateMessage:(value: string)=> void;
   setPlayingProgramme: (value: {programmeName: string; programmeSeason?:SEASON}) => void;
   setImageDownloaded: (value: boolean) => void;
   getMovies: (value: any) => void;
@@ -62,6 +66,10 @@ export const useMainStore = create((set) => ({
   appLoading: false,
   imagesDownloaded: false,
   playingProgramme: {programmeName: null, programmeSeason: null},
+  appUpdating: false,
+  appUpdateMessage: null,
+  setAppUpdate:(validate: boolean)=> set({appUpdating: validate}),
+  setAppUpdateMessage:(message: string)=> set({appUpdateMessage: message}),
   setPlayingProgramme: (validValue: {programmeName: string; programmeSeason?:SEASON}) => set({playingProgramme: validValue}),
   setImageDownloaded: (validValue: boolean) => set({imagesDownloaded: validValue}),
   getMovies: (newMovie: any) => set({ movies: newMovie }),

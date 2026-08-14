@@ -14,8 +14,13 @@ const verifiedUserHasData = (userStore.getState() as { setUserInitialized: (valu
 const getMovies = (useMainStore.getState() as { getMovies: (value: any) => void }).getMovies;
 const getSeries = (useMainStore.getState() as { getSeries: (value: any) => void }).getSeries;
 
+const addNewMovie = (useMainStore.getState() as {addMovie: (value: any)=> void}).addMovie
+const addNewSeries = (useMainStore.getState() as {addSeries: (value: any)=> void}).addSeries
+
 const getLatestMovies = (useMainStore.getState() as { addLatestMovie: (value: any) => void }).addLatestMovie;
 const getLatestSeries = (useMainStore.getState() as { addLatestSeries: (value: any) => void }).addLatestSeries;
+
+const setAppUpdateMessage = (useMainStore.getState() as {setAppUpdateMessage: (value: string)=> void}).setAppUpdateMessage
 
  const getShows = async (showUrl: string) => {
     try {
@@ -93,7 +98,7 @@ async function getAllProgrammes() {
 
   getMovies([...allMovies].sort((a, b) => Number(b.movieYear) - Number(a.movieYear)));
   getSeries([...allSeries].sort((a, b) => b.lastUpdate.localeCompare(a.lastUpdate)));
-}//
+}//end get all programmes function
 
 async function getLatestProgrames(){
   // first update series data base
@@ -127,4 +132,75 @@ async function getLatestProgrames(){
   getLatestSeries(tempSeries);
 }
 
-export { getCloudUser, extractUserInfo, getAllProgrammes, getLatestProgrames };
+async function getNewShows(){
+
+// get movies show first
+try{
+setAppUpdateMessage("Searching and Adding new movies!..")
+const moviesResponse = await fetch(`${mainUrl}/movies/new-movies`, {method: "GET"})
+
+if(!moviesResponse.ok) throw new Error("Failed to get new Movies!.")
+const movieData = await moviesResponse.json()
+
+if(movieData.message !== "Added new shows successfully!..") {
+  setAppUpdateMessage(movieData.message)
+  throw new Error(movieData.message)
+}
+
+const newMovies = movieData.results
+
+setAppUpdateMessage("Adding new Movies to Your Data Base!.")
+for(const movie of newMovies){addNewMovie(movie)}//end of 4 loop
+
+}
+catch(err: unknown){
+  const errMessage = err instanceof Error ? err.message : "Failed to Get New Shows!."
+  console.error(errMessage)
+  setAppUpdateMessage(errMessage)
+}
+
+// get new Series
+try{
+  setAppUpdateMessage("Getting New Series Shows!.")
+  const seriesResponse = await fetch(`${mainUrl}/series/new-series`, {method: "GET"})
+
+  if(!seriesResponse.ok) throw new Error("Failed to connect to server!.")
+
+    const seriesData = await seriesResponse.json()
+
+    if(seriesData.message !== "Added new shows successfully!..") throw new Error(seriesData.message)
+
+    setAppUpdateMessage("Adding new shows to Your data Base!.")
+
+    for(const show of seriesData){addNewSeries(show)}//end of 4 loop
+}
+catch(err: unknown){
+  const errMessage = err instanceof Error ? err.message : "Failed get New Series Shows!."
+  console.error(errMessage)
+}
+
+}//end of getting new shows functions
+
+async function seriesLatestUpdates(){
+  try{
+    setAppUpdateMessage("Getting latest series updates!.")
+    const seriesResponse = await fetch(`${mainUrl}/series/latestDate`, {method:"GET"})
+
+    if(!seriesResponse.ok) throw new Error("Failed to connect to server!..")
+    const seriesData = await seriesResponse.json()
+
+    if(seriesData.message !== "All Data Updated Successfully!.") throw new Error(seriesData.message)
+
+    const pause = setTimeout(()=>{
+    setAppUpdateMessage("App has Been Updated Successfully!.")
+    clearTimeout(pause)
+    }, 1200)
+  } 
+  catch(err: unknown){
+    const errMessage = err instanceof Error ? err.message : "Failed to get Series Latest Updates!."
+    setAppUpdateMessage(errMessage)
+    console.error(errMessage)
+  }
+}//end of latest series date
+
+export { getCloudUser, extractUserInfo, getAllProgrammes, getLatestProgrames, getNewShows, seriesLatestUpdates };
