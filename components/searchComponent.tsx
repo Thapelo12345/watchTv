@@ -1,4 +1,4 @@
-import { Text, View, TextInput, Pressable, Alert } from "react-native";
+import { Text, View, TextInput, Pressable, Alert, Keyboard } from "react-native";
 import { MagnifyingGlassIcon } from "react-native-heroicons/solid";
 import { usePathname } from "expo-router";
 import { useEffect, useState } from "react";
@@ -62,7 +62,7 @@ export default function SearchComponent() {
         className="bg-blue-400 p-2 rounded-md"
         onPress={async () => {
           if (!isLoaded || onlineSearchOn) return;
-
+          Keyboard.dismiss()
           if (!isSignedIn) {
             Alert.alert("APP LOCKED!.", "Your must Login First!.", [
               { text: "OK", onPress: () => console.log("User Blocked!") },

@@ -24,6 +24,8 @@ type USERTYPES = {
   userPrefferedGenres: string[];
   userInitialized: boolean;
   userPrefferendView: string;
+  userTheme: "light" | "dark";
+  setUserTheme: (theme: string)=> void;
   setPrefferendView: (value: string) => void;
   initializeUser: (value: Partial<USERTYPES>) => void;
   setUserName: (value: string) => void;
@@ -62,6 +64,8 @@ export const userStore = create((set) => ({
   userPrefferedGenres: [],
   userInitialized: false,
   userPrefferendView: "all",
+  userTheme: "light",
+  setUserTheme: (theme: string)=> set({userTheme: theme}),
   // store functions
   setPrefferendView: (view: string) => set({ userPrefferendView: view }),
   initializeUser: (userData: any) =>

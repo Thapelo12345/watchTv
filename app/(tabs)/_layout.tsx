@@ -40,10 +40,12 @@ export default function TabLayout() {
 
           tabBarActiveTintColor: "cyan",
           tabBarAllowFontScaling: true,
-          // tabBarActiveBackgroundColor: "94BAF4",
           tabBarInactiveTintColor: "white",
 
           tabBarItemStyle: {
+            alignItems: "center",
+            margin: 1,
+            borderRadius: 10,
             backgroundColor: "rgba(0, 60, 80, 0.8)",
             height: 57,
           },

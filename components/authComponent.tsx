@@ -29,6 +29,8 @@ export default function Auth({ openCloseClerk }: PROP) {
   const profileImage = userStore((state: any) => state.profilePicture);
   const userHasData = userStore((state: any) => state.userInitialized);
 
+  const currentTheme = userStore((state: any) => state.userTheme);
+
   const allMovies = useMainStore((state: any) => state.movies);
   const allSeries = useMainStore((state: any) => state.series);
 
@@ -46,6 +48,7 @@ export default function Auth({ openCloseClerk }: PROP) {
   const setImageDownloaded = useMainStore(
     (state: any) => state.setImageDownloaded,
   );
+  const setTheme = userStore((state: any) => state.setUserTheme);
 
   // this is the store functions runing the app updates
   const setAppUpdate = useMainStore((state: any) => state.setAppUpdate);
@@ -80,6 +83,19 @@ export default function Auth({ openCloseClerk }: PROP) {
     }
   };
 
+  const getSystemTheme = async () => {
+    try {
+      const systemTheme = await AsyncStorage.getItem("THEME");
+      if (!systemTheme) throw new Error("No save date!.");
+      setTheme(systemTheme);
+    } catch (err: unknown) {
+      await AsyncStorage.setItem("THEME", currentTheme);
+      console.error(
+        err instanceof Error ? err.message : "Could'nt get System Theme!.",
+      );
+    }
+  };
+
   function generateNewUpdateDate() {
     const today = new Date("2026-08-17");
     const day = today.getDay();
@@ -109,7 +125,10 @@ export default function Auth({ openCloseClerk }: PROP) {
   } //end of downloading images function
 
   // this use effect checks for date updates
-  useEffect(() => {getUpdateDate();}, []);
+  useEffect(() => {
+    getSystemTheme();
+    getUpdateDate();
+  }, []);
 
   // use auth useEffect to check if the user is signed in and has data, if not get the data from the server and initialize the user store
   useEffect(() => {

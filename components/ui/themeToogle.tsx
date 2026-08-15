@@ -1,32 +1,32 @@
-import { View, Text, Switch } from "react-native";
+import { View, Switch } from "react-native";
 import { SunIcon, MoonIcon } from "react-native-heroicons/outline";
-import { Appearance } from "react-native";
 import { useTheme } from "@/constants/myTheme";
-import { useColorScheme } from "react-native";
-import { useState, useEffect } from "react";
+import { userStore } from "@/stateManagement/userStore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useEffect } from "react";
 
 export default function ThemeToggle() {
-  const themeSchema = useColorScheme();
+
+  // store static states
+  const currentTheme = userStore((state: any)=> state.userTheme)
+
+  // store function state
+  const setTheme = userStore((state: any)=> state.setUserTheme)
+
   const theme = useTheme();
-  const [darkAnable, setEnable] = useState(false);
+  const isDarkMode = currentTheme === "dark";
 
-//   useEffect(() => {
-//     Appearance.setColorScheme(!darkAnable ? "light" : "dark");
-//     console.log("This is the current theme MODE: ", Appearance.getColorScheme())
-//     console.log("This is the theme schema: ", themeSchema)
+ const toggleTheme = (newValue: boolean) => {
+    const nextTheme = newValue ? "dark" : "light";
+    // 1. Force the UI to update IMMEDIATELY (Zero visual lag)
+    setTheme(nextTheme);
 
-//   }, [darkAnable]);
-
-useEffect(() => {
-
-    console.log("This is the value of the schema: ", themeSchema)
-    setEnable(themeSchema === "dark");
-  }, [themeSchema]);
-
-  const toggleTheme = (newValue: boolean): void => {
-    setEnable(newValue);
-    Appearance.setColorScheme(newValue ? "dark" : "light");
+    // 2. Fire and forget the disk operation asynchronously
+    AsyncStorage.setItem("THEME", nextTheme).catch((error) => {
+      console.error("Failed to save theme to storage:", error);
+    });
   }
+
 
   return (
     <View
@@ -46,11 +46,10 @@ useEffect(() => {
         />
       </View>
       <Switch
-        value={darkAnable}
+        value={isDarkMode}
         trackColor={{ false: "#767577", true: "gray" }}
-        thumbColor={darkAnable ? "white" : "cyan"}
+        thumbColor={isDarkMode ? "white" : "cyan"}
         ios_backgroundColor="#3e3e3e"
-        // onValueChange={() =>  setEnable((prev)=> !prev)}
         onValueChange={toggleTheme}
       />
     </View>

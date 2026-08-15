@@ -50,7 +50,8 @@ type STORETYPES = {
 };
 
 export const useMainStore = create((set) => ({
-  baseUrl: "http://192.168.18.7:5000",
+  // baseUrl: "http://192.168.18.7:5000",
+  baseUrl: "https://neststream-server.onrender.com",
   movies: [],
   latestMovies: [],
   series: [],
