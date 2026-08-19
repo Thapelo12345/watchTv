@@ -28,26 +28,40 @@ export default function SelectComponent({
   setSeason,
   setEpisode,
 }: PROPS) {
+  const { isLoaded, isSignedIn } = useAuth();
 
-  const { isLoaded, isSignedIn } = useAuth()
-
+  // store solid state
   const baseUrl = useMainStore((state: any) => state.baseUrl);
-  const addToMainSeries = useMainStore((state: any) => state.addSeasonToSeries);
-  const addToSelected = useMainStore((state: any) => state.addSeasonToSelected);
 
-  const allSeasons = seasonsEpisode.map(
-    (currentSeason) => currentSeason.season,
-  );
+  // store action state
+  const addToMainSeries = useMainStore((state: any) => state.addSeasonToSeries);
+
+  const [allSeasons, setAllSeasons] = useState<any[]>([])
 
   const [openSeasonDropDown, setSeasonDropDown] = useState(false);
   const [openEpisodeDropDown, setEpisodeDropDown] = useState(false);
 
   const [allEpisode, setAllEpisode] = useState<string[]>([]);
 
+  useEffect(()=>{
+
+    if(allSeasons.length !== 0 ) return
+    const tempSeasons = seasonsEpisode.map((currentSeason) => currentSeason.season)
+    setAllSeasons(tempSeasons)
+  }, [])
+
   useEffect(() => {
-    const activeSeason = seasonsEpisode.find((season) => season.season == selectedSeason);
-    const episodeArray = activeSeason.episodes.map((episode: any) => episode.name);
+    const activeSeason = seasonsEpisode.find(
+      (season) => season.season == selectedSeason,
+    );
+
+    if(!activeSeason) return
+
+    const episodeArray = activeSeason.episodes.map(
+      (episode: any) => episode.name,
+    );
     setAllEpisode(episodeArray);
+
   }, [selectedSeason]);
 
   return (
@@ -101,13 +115,15 @@ export default function SelectComponent({
         ) : (
           <Pressable
             onPress={async () => {
-              if(!isLoaded) return
+              if (!isLoaded) return;
 
-              if(!isSignedIn){
-                Alert.alert("APP LOCKED!.", "You Need an account first, Before you can Add a new Series show",
-                  [{text: "OK", onPress: ()=> console.log("App Locked!.")}]
-                )
-                return
+              if (!isSignedIn) {
+                Alert.alert(
+                  "APP LOCKED!.",
+                  "You Need an account first, Before you can Add a new Series show",
+                  [{ text: "OK", onPress: () => console.log("App Locked!.") }],
+                );
+                return;
               }
               setaddingSeason(true);
 
@@ -127,6 +143,7 @@ export default function SelectComponent({
               }
 
               const seasonData = await response.json();
+
               if (seasonData.message === "Failed to add season!..") {
                 Alert.alert("SEARCH RESULTS", "could get the next season!...", [
                   { text: "OK", onPress: () => setaddingSeason(false) },
@@ -135,13 +152,14 @@ export default function SelectComponent({
               }
 
               // this adds the new season to the main series array
-              addToMainSeries(showTitle, seasonData.Season);
+              addToMainSeries(showTitle, seasonData.nextSeason);
 
-              // this adds the season only to selected show that is on the show info page
-              addToSelected(seasonData.Season);
+              setAllSeasons((prev)=>[...prev, seasonData.nextSeason.season])
+              setAllEpisode(seasonData.nextSeason.episodes.map((episode: any)=> episode.name));
 
-              setSeason(seasonData.Season.season);
+              setSeason(seasonData.nextSeason.season);
               setaddingSeason(false);
+
             }}
           >
             <View className="border-2 border-white px-4 p-1 rounded-lg m-2 my-4 flex flex-row gap-1.5">

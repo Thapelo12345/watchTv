@@ -17,7 +17,7 @@ export default function Home() {
 
   // getting mongodb data
   useEffect(() => {
-    if(movies.length !== 0) {
+    if(movies && movies.length !== 0) {
       setSeriesImages(
         series.map((show: any) => {
           return { id: show._id, imageUrl: show.seriesImageUrl };
@@ -25,14 +25,13 @@ export default function Home() {
       );
     }
 
-    if(series.length !== 0) {
+    if(series && series.length !== 0) {
       setMoviesImages(
         movies.map((movie: any) => {
           return { id: movie._id, imageUrl: movie.movieImageUrl };
         }),
       );
     }
-    
   }, [movies, series]);
 
   return (

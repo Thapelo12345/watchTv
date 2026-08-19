@@ -11,7 +11,6 @@ import { useMainStore } from "@/stateManagement/store";
 import { userStore } from "@/stateManagement/userStore";
 import { Play, upDateLickedShows } from "@/utils/showInfo-util";
 import { Alert } from "react-native";
-// import HeartOutlineIcon from "react-native-heroicons/outline/HeartIcon";
 import { HeartIcon as HeartOutlineIcon } from "react-native-heroicons/outline";
 import { useTheme } from "@/constants/myTheme";
 
@@ -134,7 +133,15 @@ export default function Infor() {
 
               <Pressable
               className="mr-10"
-              onPress={()=>upDateLickedShows(setLoad, likedShow, selected_show)}
+              onPress={()=>{
+                if(!isSignedIn){
+                  Alert.alert("SYSTEM BLOCK", "APP LOCKED\n please sign in!...", 
+                    [{text: "Ok", onPress: ()=> console.log("App is locked")}]
+                  )
+                  return
+                }
+                upDateLickedShows(setLoad, likedShow, selected_show)
+              }}
               >
                 {likedShow ? <HeartIcon color="white" size={30} /> : <HeartOutlineIcon color="white" size={30} />}
               </Pressable>

@@ -60,7 +60,7 @@ const MyGlobalCustomTheme = {
   });
 
   const a_show_is_playing = useMainStore((state: any) => state.playing);
-
+  
   const [openClerk, setOpenclerk] = useState(false)
   const [showPlaying, setShowPlaying] = useState(false);
 
