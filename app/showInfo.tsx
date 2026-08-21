@@ -5,7 +5,7 @@ import { BlurView } from "expo-blur";
 import SelectComponent from "@/components/selector";
 import { PlayIcon, HeartIcon } from "react-native-heroicons/solid";
 import CastSection from "@/components/castSection";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@clerk/expo";
 import { useMainStore } from "@/stateManagement/store";
 import { userStore } from "@/stateManagement/userStore";
@@ -13,16 +13,18 @@ import { Play, upDateLickedShows } from "@/utils/showInfo-util";
 import { Alert } from "react-native";
 import { HeartIcon as HeartOutlineIcon } from "react-native-heroicons/outline";
 import { useTheme } from "@/constants/myTheme";
+import { useNavigation } from '@react-navigation/native';
 
 export default function Infor() {
-
   const theme = useTheme()
+  const navigation = useNavigation();
 
   const selected_show = useMainStore((state: any) => state.selectedShow);
   const { isLoaded, isSignedIn } = useAuth();
 
   // store solid state 
   const lickedProgrammes = userStore((state: any) => state.userLiked);
+  const infoLocked = useMainStore((state: any)=> state.showInfoLocked)
 
   // store action states
   const setCurrentlyPlaying = useMainStore((state: any) => state.setPlayingProgramme);
@@ -39,6 +41,26 @@ export default function Infor() {
   const pendingSeasons = selected_show?.programmeType == "series" ? (selected_show?.programme?.pendingSeasons?.length || 0) !== 0 : false;
   const genres = selected_show?.programme?.movieGenres || selected_show?.programme?.seriesGenres || [];
   const actors = selected_show?.programme?.movieCast || selected_show?.programme?.seriesCast || [];
+
+  useEffect(()=>{
+  navigation.setOptions({gestureEnabled: infoLocked ? false : true,});
+
+  const unsubscribe = navigation.addListener('beforeRemove', (e) => {
+  if(infoLocked){
+
+    console.log(`This is the info page Locked: ${infoLocked}`)
+    
+    e.preventDefault();
+    Alert.alert("SYSTEM NOTIFICATION","Server Still Processing your request\nPlease be pateint!... ",
+      [{text: "wait", onPress: ()=> console.log("Waiting for server!.")}]
+    )
+      
+  }//end of if
+    
+    })
+
+    return unsubscribe
+  }, [navigation, infoLocked])
 
   useEffect(() => {
 
@@ -134,6 +156,7 @@ export default function Infor() {
               <Pressable
               className="mr-10"
               onPress={()=>{
+                if(infoLocked) return
                 if(!isSignedIn){
                   Alert.alert("SYSTEM BLOCK", "APP LOCKED\n please sign in!...", 
                     [{text: "Ok", onPress: ()=> console.log("App is locked")}]
@@ -146,7 +169,6 @@ export default function Infor() {
                 {likedShow ? <HeartIcon color="white" size={30} /> : <HeartOutlineIcon color="white" size={30} />}
               </Pressable>
               </View>) : (<ActivityIndicator color="skyBlue" size="large" />)}
-
 
               {/* Genres section */}
               <View className="flex flex-row w-full">

@@ -24,6 +24,9 @@ type STORETYPES = {
   };
   appUpdating: boolean;
   appUpdateMessage: string | null;
+  showInfoLocked: boolean;
+
+  setShowInfoLocked: (value: boolean)=> void;
   setAppUpdate: (value: boolean) => void;
   setAppUpdateMessage: (value: string) => void;
   setPlayingProgramme: (value: { programmeName: string; programmeSeason?: SEASON }) => void;
@@ -52,8 +55,8 @@ type STORETYPES = {
 
 // Applied STORETYPES to enforce strict compile-time checks
 export const useMainStore = create<STORETYPES>((set) => ({
-  // baseUrl: "http://192.168.18.7:5000",
-  baseUrl: "https://neststream-server.onrender.com",
+  baseUrl: "http://192.168.18.7:5000",
+  // baseUrl: "https://neststream-server.onrender.com",
   movies: [],
   latestMovies: [],
   series: [],
@@ -71,7 +74,9 @@ export const useMainStore = create<STORETYPES>((set) => ({
   playingProgramme: { programmeName: null, programmeSeason: null },
   appUpdating: false,
   appUpdateMessage: null,
-  
+  showInfoLocked: false,
+
+  setShowInfoLocked: (isLocked: boolean)=> set({showInfoLocked: isLocked}),
   setAppUpdate: (validate) => set({ appUpdating: validate }),
   setAppUpdateMessage: (message) => set({ appUpdateMessage: message }),
   setPlayingProgramme: (validValue) => set({ playingProgramme: validValue }),

@@ -32,9 +32,11 @@ export default function SelectComponent({
 
   // store solid state
   const baseUrl = useMainStore((state: any) => state.baseUrl);
+  const infoLocked = useMainStore((state: any)=> state.showInfoLocked)
 
   // store action state
   const addToMainSeries = useMainStore((state: any) => state.addSeasonToSeries);
+  const lockInfoPage = useMainStore((state: any)=> state.setShowInfoLocked)
 
   const [allSeasons, setAllSeasons] = useState<any[]>([])
 
@@ -43,14 +45,19 @@ export default function SelectComponent({
 
   const [allEpisode, setAllEpisode] = useState<string[]>([]);
 
-  useEffect(()=>{
+  // this useEffect will signal for server close
+  useEffect(()=>{}, [])
 
-    if(allSeasons.length !== 0 ) return
+  useEffect(()=>{
+    if(allSeasons.length !== 0 || !seasonsEpisode || seasonsEpisode.length === 0) return
     const tempSeasons = seasonsEpisode.map((currentSeason) => currentSeason.season)
     setAllSeasons(tempSeasons)
   }, [])
 
   useEffect(() => {
+
+    if(!seasonsEpisode || seasonsEpisode.length === 0) return
+
     const activeSeason = seasonsEpisode.find(
       (season) => season.season == selectedSeason,
     );
@@ -72,7 +79,7 @@ export default function SelectComponent({
           <Pressable
             className="series-btn"
             onPress={() => {
-              if (addingSeaon) return;
+              if (addingSeaon || infoLocked) return;
               setSeasonDropDown(!openSeasonDropDown);
               if (openEpisodeDropDown) setEpisodeDropDown(false);
             }}
@@ -92,7 +99,7 @@ export default function SelectComponent({
           <Pressable
             className="series-btn"
             onPress={() => {
-              if (addingSeaon) return;
+              if (addingSeaon || infoLocked) return;
               setEpisodeDropDown(!openEpisodeDropDown);
               if (openSeasonDropDown) setSeasonDropDown(false);
             }}
@@ -125,6 +132,9 @@ export default function SelectComponent({
                 );
                 return;
               }
+
+              // here i am lockng the infor page it deos send other request to server
+              lockInfoPage(true)
               setaddingSeason(true);
 
               const response = await fetch(`${baseUrl}/series/add-season`, {
@@ -137,16 +147,22 @@ export default function SelectComponent({
                 Alert.alert(
                   "BROBLEM WITH THE SERVER",
                   "failed to connect with server!...",
-                  [{ text: "OK", onPress: () => setaddingSeason(false) }],
+                  [{ text: "OK", onPress: () => {
+                    lockInfoPage(false)
+                    setaddingSeason(false)
+                  } }],
                 );
                 return;
               }
 
               const seasonData = await response.json();
 
-              if (seasonData.message === "Failed to add season!..") {
-                Alert.alert("SEARCH RESULTS", "could get the next season!...", [
-                  { text: "OK", onPress: () => setaddingSeason(false) },
+              if (seasonData.message !== "Season Retrived successfully!.") {
+                Alert.alert("SEARCH RESULTS", seasonData.message, [
+                  { text: "OK", onPress: () => {
+                    lockInfoPage(false)
+                    setaddingSeason(false)
+                  } },
                 ]);
                 return;
               }
@@ -158,8 +174,8 @@ export default function SelectComponent({
               setAllEpisode(seasonData.nextSeason.episodes.map((episode: any)=> episode.name));
 
               setSeason(seasonData.nextSeason.season);
+              lockInfoPage(false)
               setaddingSeason(false);
-
             }}
           >
             <View className="border-2 border-white px-4 p-1 rounded-lg m-2 my-4 flex flex-row gap-1.5">

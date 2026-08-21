@@ -3,9 +3,8 @@ import { useMainStore } from "@/stateManagement/store";
 import { userStore } from "@/stateManagement/userStore";
 import { router } from "expo-router";
 
-const basedUrl = (useMainStore.getState() as { baseUrl: string }).baseUrl;
-const positionedAt = (useMainStore.getState() as { selectedPosition: number })
-  .selectedPosition;
+const mainUrl = (useMainStore.getState() as { baseUrl: string }).baseUrl;
+const positionedAt = (useMainStore.getState() as { selectedPosition: number }).selectedPosition;
 
 // store action state's
 const editMovies = (
@@ -50,7 +49,7 @@ async function Play(
     let currentUrl = showToPlay.programme.playingUrl;
 
     if (!currentUrl) {
-      const response = await fetch(`${basedUrl}/update-movie`, {
+      const response = await fetch(`${mainUrl}/update-movie`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -92,7 +91,7 @@ async function Play(
     );
     // if url not found
     if (currentEpisode.play == "no url found") {
-      const response = await fetch(`${basedUrl}/series-url-search`, {
+      const response = await fetch(`${mainUrl}/series-url-search`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -165,7 +164,7 @@ async function upDateLickedShows(
   }
 
   try{
-    const updateCloud = await fetch(`${basedUrl}/user/update-userLikes`, {
+    const updateCloud = await fetch(`${mainUrl}/user/update-userLikes`, {
       method: "POST",
       headers:{ "Content-Type": "application/json" },
       body: JSON.stringify({
