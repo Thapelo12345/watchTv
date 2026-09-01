@@ -1,8 +1,5 @@
 import { useMainStore } from "@/stateManagement/store";
 import { userStore } from "@/stateManagement/userStore";
-import { router } from "expo-router";
-import { Alert } from "react-native";
-import { useAuth } from "@clerk/expo";
 
 // store sates here
 const mainUrl = (useMainStore.getState() as { baseUrl: string }).baseUrl;
@@ -95,7 +92,7 @@ async function getAllProgrammes() {
   const allMovies = await getShows(`${mainUrl}/movies/programs`);
   const allSeries = await getShows(`${mainUrl}/series/programs`);
 
-
+if(allMovies.length === 0 || allSeries.length === 0) throw new Error("Failed To Get Data!.")
   getMovies([...allMovies].sort((a, b) => Number(b.movieYear) - Number(a.movieYear)));
   getSeries([...allSeries].sort((a, b) => b.lastUpdate.localeCompare(a.lastUpdate)));
 }//end get all programmes function
@@ -105,32 +102,15 @@ async function getLatestProgrames(){
   const movies = (useMainStore.getState() as {movies: any[]}).movies;
   const series = (useMainStore.getState() as {series: any[]}).series;
 
-  // try{
-
-  //   const serieUpdateResponse = await fetch(`${mainUrl}/series/lastDate`, { method: "GET" });
-
-  //   if(!serieUpdateResponse.ok) throw new Error("Failed to update series data!.")
-
-  //     const data = await serieUpdateResponse.json();
-
-  //     if(data.message !== "All Data Updated Successfully!.") throw new Error("Failed to update series data!.")
-  // }
-  // catch(err: unknown){
-  //   const errMessage = err instanceof Error ? err.message : "unknown error";
-  //   console.error("Error in getting latest programes\n", errMessage);
-  // }
-
   let tempMovie: any[] = [];
   let tempSeries: any[] = [];
 
-      for (let i = 0; i < 10; i++) {
-        tempMovie.push(movies[i]);
-        tempSeries.push(series[i]);
-      } //end of 4 loop
+  tempMovie = movies.slice(0, 10);
+  tempSeries = series.slice(0, 10);
 
   getLatestMovies(tempMovie);
   getLatestSeries(tempSeries);
-}
+}//end of get latest programmes
 
 async function getNewShows(){
 

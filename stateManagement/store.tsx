@@ -55,8 +55,8 @@ type STORETYPES = {
 
 // Applied STORETYPES to enforce strict compile-time checks
 export const useMainStore = create<STORETYPES>((set) => ({
-  baseUrl: "http://192.168.18.7:5000",
-  // baseUrl: "https://neststream-server.onrender.com",
+  // baseUrl: "http://192.168.18.7:5000",
+  baseUrl: "https://neststream-server.onrender.com",
   movies: [],
   latestMovies: [],
   series: [],

@@ -1,15 +1,21 @@
-import { View, Text, BackHandler, TouchableOpacity, Platform, Alert } from "react-native";
+import {
+  View,
+  Text,
+  BackHandler,
+  TouchableOpacity,
+  Platform,
+} from "react-native";
 import { WebView, WebViewNavigation } from "react-native-webview";
 import { useMainStore } from "@/stateManagement/store";
 import * as ScreenOrientation from "expo-screen-orientation";
 import { useNavigation } from "expo-router";
-import * as NavigationBar from 'expo-navigation-bar';
+import * as NavigationBar from "expo-navigation-bar";
 import { useEffect } from "react";
 
 export default function PlayComponent() {
   const navigation = useNavigation();
 
-  // store state 
+  // store state
   const userID = useMainStore((state: any) => state.userId);
   const mainUrl = useMainStore((state: any) => state.baseUrl);
 
@@ -20,11 +26,15 @@ export default function PlayComponent() {
 
   // store action state
   const turnOffPlay = useMainStore((state: any) => state.setPlaying);
-  const saveUnfinishedShow = useMainStore((state: any) => state.addUnfinishedShow); 
-  const removeUnfinishedShow = useMainStore((state: any) => state.removeUnfinishedShow);
+  const saveUnfinishedShow = useMainStore(
+    (state: any) => state.addUnfinishedShow,
+  );
+  const removeUnfinishedShow = useMainStore(
+    (state: any) => state.removeUnfinishedShow,
+  );
   const addToHistory = useMainStore((state: any) => state.addWatchedShow);
-  
-const SERVER1_INJECTED_JAVASCRIPT = `
+
+  const SERVER1_INJECTED_JAVASCRIPT = `
 (function() {
   // Helper function to safely send message packets back to React Native
   function sendLog(type, details = {}) {
@@ -220,151 +230,191 @@ const SERVER1_INJECTED_JAVASCRIPT = `
 true;
 `;
 
-
-// Hidding the Android navigation bar when the video is playing to provide a full-screen experience
-async function configureAndroidSystemUI() { if (Platform.OS === 'android') await NavigationBar.setVisibilityAsync('hidden')}
-
-const handleMessage = async (event: any) => {
-    const messageData = JSON.parse(event.nativeEvent.data); 
-    const orientation = await ScreenOrientation.getOrientationAsync();
-
-    if(messageData.type === "VIDEO_PLAYING") {
-      if (Platform.OS === 'android' && (orientation === 1 || orientation === 2)){
-        await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
-        await configureAndroidSystemUI()
-    }
-
-    }//end of if
-
-    else if(messageData.type === "VIDEO_HALF_REACHED") {
-
-      console.log("HALF TIME RUN!...")
-      if(unFinishedShows.find((show: any)=> show.programmeName === currentlyPlaying.programmeName)) return
-      saveUnfinishedShow(currentlyPlaying)
-
-      try{
-        const upDateCloud = await fetch(`${mainUrl}/user/update-continue-watch`, {
-          method: "POST",
-          headers: {"Content-Type": "application/json"},
-          body: JSON.stringify({
-            id: userID,
-            continueWatch: unFinishedShows
-          })
-        })
-
-        if(!upDateCloud.ok) throw new Error("Failed to update cloud!..")
-
-          const data = await upDateCloud.json()
-
-          if(data.message !== "Cloud Updated SuccessFully!..") throw new Error(data.message)
-
-          console.log("CLOUD UPDATED!..")
-      }
-      catch(err: unknown){console.log(err instanceof Error ? err.message : "unknown error!..")}
-    }  
-
-    else if(messageData.type === "VIDEO_WATCHED") {
-
-    if(unFinishedShows.find((show: any)=> show.programmeName === currentlyPlaying.programmeName)) {
-      removeUnfinishedShow(currentlyPlaying.programmeName)
-
-      try{
-        const cloudUpdate = await fetch(`${mainUrl}/user/update-continue-watch`, {
-          method: "POST",
-          headers: {"Content-Type": "application/json"},
-          body: JSON.stringify({
-            id: userID,
-            continueWatch: unFinishedShows
-          })
-        })
-
-        if(!cloudUpdate.ok) throw new Error("Failed to update cloud!..")
-        const data = await cloudUpdate.json()
-        if(data.message !== "Cloud Updated SuccessFully!..") throw new Error(data.message)
-      }
-      catch(err: unknown){console.error(err instanceof Error ? err.message : "unknown error!..")}
-    }
-
-    if(!showHistory.find((show: any)=> show === currentlyPlaying.programmeName)) {
-      addToHistory(currentlyPlaying.programmeName)
-      try{
-        const cloudUpdate = await fetch(`${mainUrl}/user/update-history`, {
-          method: "POST",
-          headers: {"Content-Type": "application/json"},
-          body: JSON.stringify({
-            id: userID,
-            history: showHistory
-          })
-        })
-        if(!cloudUpdate.ok) throw new Error("Failed to update cloud!..")
-        const data = await cloudUpdate.json()
-        if(data.message !== "Cloud SuccessFully Updated!.") throw new Error(data.message)
-      }
-      catch(err: unknown){console.error(err instanceof Error ? err.message : "unknown error!..")}
-      }
-    }
-
-    else if(messageData.type === "VIDEO_NOT-FOUND") {
-      console.log("Video not found or link broken. Please check the URL or contact support.");
-    }
-
-};
-
-  useEffect(() => {
-
-  const backAction = async()=>{await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP,);
-  // turnOffPlay(false)
+  // Hidding the Android navigation bar when the video is playing to provide a full-screen experience
+  async function configureAndroidSystemUI() {
+    if (Platform.OS === "android")
+      await NavigationBar.setVisibilityAsync("hidden");
   }
 
-    const backHandler = BackHandler.addEventListener("hardwareBackPress", ()=> {backAction()});
+  const handleMessage = async (event: any) => {
+    const messageData = JSON.parse(event.nativeEvent.data);
+    const orientation = await ScreenOrientation.getOrientationAsync();
+
+    if (messageData.type === "VIDEO_PLAYING") {
+      if (
+        Platform.OS === "android" &&
+        (orientation === 1 || orientation === 2)
+      ) {
+        await ScreenOrientation.lockAsync(
+          ScreenOrientation.OrientationLock.LANDSCAPE,
+        );
+        await configureAndroidSystemUI();
+      }
+    } //end of if
+    else if (messageData.type === "VIDEO_HALF_REACHED") {
+      console.log("HALF TIME RUN!...");
+      if (
+        unFinishedShows.find(
+          (show: any) => show.programmeName === currentlyPlaying.programmeName,
+        )
+      )
+        return;
+      saveUnfinishedShow(currentlyPlaying);
+
+      try {
+        const upDateCloud = await fetch(
+          `${mainUrl}/user/update-continue-watch`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              id: userID,
+              continueWatch: unFinishedShows,
+            }),
+          },
+        );
+
+        if (!upDateCloud.ok) throw new Error("Failed to update cloud!..");
+
+        const data = await upDateCloud.json();
+
+        if (data.message !== "Cloud Updated SuccessFully!..")
+          throw new Error(data.message);
+
+        console.log("CLOUD UPDATED!..");
+      } catch (err: unknown) {
+        console.log(err instanceof Error ? err.message : "unknown error!..");
+      }
+    } else if (messageData.type === "VIDEO_WATCHED") {
+      if (
+        unFinishedShows.find(
+          (show: any) => show.programmeName === currentlyPlaying.programmeName,
+        )
+      ) {
+        removeUnfinishedShow(currentlyPlaying.programmeName);
+
+        try {
+          const cloudUpdate = await fetch(
+            `${mainUrl}/user/update-continue-watch`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                id: userID,
+                continueWatch: unFinishedShows,
+              }),
+            },
+          );
+
+          if (!cloudUpdate.ok) throw new Error("Failed to update cloud!..");
+          const data = await cloudUpdate.json();
+          if (data.message !== "Cloud Updated SuccessFully!..")
+            throw new Error(data.message);
+        } catch (err: unknown) {
+          console.error(
+            err instanceof Error ? err.message : "unknown error!..",
+          );
+        }
+      }
+
+      if (
+        !showHistory.find(
+          (show: any) => show === currentlyPlaying.programmeName,
+        )
+      ) {
+        addToHistory(currentlyPlaying.programmeName);
+        try {
+          const cloudUpdate = await fetch(`${mainUrl}/user/update-history`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              id: userID,
+              history: showHistory,
+            }),
+          });
+          if (!cloudUpdate.ok) throw new Error("Failed to update cloud!..");
+          const data = await cloudUpdate.json();
+          if (data.message !== "Cloud SuccessFully Updated!.")
+            throw new Error(data.message);
+        } catch (err: unknown) {
+          console.error(
+            err instanceof Error ? err.message : "unknown error!..",
+          );
+        }
+      }
+    } else if (messageData.type === "VIDEO_NOT-FOUND") {
+      console.log(
+        "Video not found or link broken. Please check the URL or contact support.",
+      );
+    }
+  };
+
+  useEffect(() => {
+    const backAction = async () => {
+      await ScreenOrientation.lockAsync(
+        ScreenOrientation.OrientationLock.PORTRAIT_UP,
+      );
+      // turnOffPlay(false)
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      () => {
+        backAction();
+      },
+    );
 
     return () => {
-      turnOffPlay(false)
+      turnOffPlay(false);
       backHandler.remove();
-      ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP);
-      if (Platform.OS === 'android') NavigationBar.setVisibilityAsync('visible');
+      ScreenOrientation.lockAsync(
+        ScreenOrientation.OrientationLock.PORTRAIT_UP,
+      );
+      if (Platform.OS === "android")
+        NavigationBar.setVisibilityAsync("visible");
     };
   }, []);
 
   return (
     <View className="flex-1 bg-black">
-
-<View className="flex-1 w-full h-full">
-
-      <WebView
-            source={{ uri: playableUrl }}
-            androidHardwareAccelerationDisabled={Platform.OS === 'android'}
-            style={{ width: "100%", height: "100%" }}
-            setSupportMultipleWindows={false}
-            domStorageEnabled={true}
-            javaScriptEnabled={true}
-            injectedJavaScriptForMainFrameOnly={false}
-            injectedJavaScript={SERVER1_INJECTED_JAVASCRIPT}
-            onMessage={handleMessage}
-            
-            // Local fallback intercept for primary domain SSL issues
-            onReceivedSslError={(syntheticEvent: any) => {syntheticEvent.preventDefault()}}
-            onShouldStartLoadWithRequest={(request: WebViewNavigation) => {return request.url === playableUrl}}
-      
+      <View className="flex-1 w-full h-full">
+        <WebView
+          source={{ uri: playableUrl }}
+          startInLoadingState={true}
+          androidHardwareAccelerationDisabled={Platform.OS === "android"}
+          style={{ width: "100%", height: "100%" }}
+          setSupportMultipleWindows={false}
+          domStorageEnabled={true}
+          javaScriptEnabled={true}
+          injectedJavaScriptForMainFrameOnly={false}
+          injectedJavaScript={SERVER1_INJECTED_JAVASCRIPT}
+          onMessage={handleMessage}
+          // Local fallback intercept for primary domain SSL issues
+          onReceivedSslError={(syntheticEvent: any) => {
+            syntheticEvent.preventDefault();
+          }}
+          onShouldStartLoadWithRequest={(request: WebViewNavigation) => {
+            return request.url === playableUrl;
+          }}
           // Catch basic network dropouts or loading failures
           onError={(syntheticEvent) => {
             const { nativeEvent } = syntheticEvent;
-            console.warn('WebView error: ', nativeEvent.description);
-      }}
-          />
-</View>
-      
+            console.warn("WebView error: ", nativeEvent.description);
+          }}
+        />
+      </View>
 
-      {Platform.OS === "ios" && <TouchableOpacity
-        onPress={() => {
-          turnOffPlay(false);
-          navigation.goBack();
-        }}
-        className="absolute top-6 left-6 w-12 h-12 bg-black/60 rounded-full items-center justify-center z-50"
-      >
-        <Text className="text-white text-xl font-bold">✕</Text>
-      </TouchableOpacity>
-      }
+      {Platform.OS === "ios" && (
+        <TouchableOpacity
+          onPress={() => {
+            turnOffPlay(false);
+            navigation.goBack();
+          }}
+          className="absolute top-6 left-6 w-12 h-12 bg-black/60 rounded-full items-center justify-center z-50"
+        >
+          <Text className="text-white text-xl font-bold">✕</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }

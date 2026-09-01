@@ -1,4 +1,4 @@
-import { View, Text, Pressable, Modal } from "react-native";
+import { View, Text, Pressable, Platform } from "react-native";
 import { Alert } from "react-native";
 import { Image } from "expo-image";
 import { useAuth, useUser } from "@clerk/expo";
@@ -14,7 +14,9 @@ import {
   seriesLatestUpdates,
 } from "@/utils/auth-utils";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useEffect, useRef } from "react";
+import { BackHandler } from "react-native";
+import RNExitApp from "react-native-exit-app";
+import { useEffect, useRef, useState } from "react";
 
 type PROP = {
   openCloseClerk: (value: boolean) => void;
@@ -61,11 +63,13 @@ export default function Auth({ openCloseClerk }: PROP) {
 
   const appUpdatesRuning = useRef(false);
 
+  const [refresh, setRefresh] = useState(false);
+
   // system date update
   const getUpdateDate = async () => {
     try {
       const savedUpdatedate = await AsyncStorage.getItem("DATE_UPDATE");
-      if (!savedUpdatedate) throw new Error("No save date!.");
+      if (!savedUpdatedate) throw new Error("No System save Date!.");
       updateDate.current = savedUpdatedate;
     } catch (err: unknown) {
       const errMessage =
@@ -73,6 +77,7 @@ export default function Auth({ openCloseClerk }: PROP) {
       console.log(errMessage);
     }
   };
+
   const setUpdateDate = async (newDate: string) => {
     try {
       const newerDate = await AsyncStorage.setItem("DATE_UPDATE", newDate);
@@ -181,9 +186,35 @@ export default function Auth({ openCloseClerk }: PROP) {
 
   // programe useEffect to get the latest programes from the server and update the store
   useEffect(() => {
-    if (allMovies.length === 0 && allSeries.length === 0) getAllProgrammes();
+    if (allMovies.length === 0 && allSeries.length === 0) {
+      try {
+        getAllProgrammes();
+      } catch (err: unknown) {
+        const errMessage =
+          err instanceof Error ? err.message : "unknown server Error!...";
+
+        console.error(errMessage);
+        Alert.alert(
+          "SERVER ERROR!.",
+          "Failed To Get Data From the Server\nApp Is Being Closed!..",
+          [
+            {
+              text: "Close App",
+              onPress: () =>{
+
+                Platform.OS === "android"
+                  ? BackHandler.exitApp()
+                  : RNExitApp.exitApp()
+                  console.log("App is Being Closed!..")
+                }
+            },
+            { text: "Retry", onPress: () => setRefresh((prev) => !prev) },
+          ],
+        );
+      }
+    }
     if (allMovies.length !== 0 && allSeries.length !== 0) getLatestProgrames();
-  }, [allMovies, allSeries]);
+  }, [allMovies, allSeries, refresh]);  // this use effect downloads images to my device
 
   useEffect(() => {
     if (

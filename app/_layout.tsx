@@ -43,16 +43,15 @@ const tokenCache = {
 };
 
 export default function RootLayout() {
-
-  const theme = useTheme()
+  const theme = useTheme();
   // 1. Create your custom theme object
-const MyGlobalCustomTheme = {
-  ...DarkTheme, // Base it on DarkTheme to automatically flip native system text defaults
-  colors: {
-    ...DarkTheme.colors,
-    background: theme.background
-  },
-};
+  const MyGlobalCustomTheme = {
+    ...DarkTheme, // Base it on DarkTheme to automatically flip native system text defaults
+    colors: {
+      ...DarkTheme.colors,
+      background: theme.background,
+    },
+  };
 
   const [fontsLoaded] = useFonts({
     Lobster_400Regular,
@@ -60,8 +59,8 @@ const MyGlobalCustomTheme = {
   });
 
   const a_show_is_playing = useMainStore((state: any) => state.playing);
-  
-  const [openClerk, setOpenclerk] = useState(false)
+
+  const [openClerk, setOpenclerk] = useState(false);
   const [showPlaying, setShowPlaying] = useState(false);
 
   // warming up the browser
@@ -83,11 +82,15 @@ const MyGlobalCustomTheme = {
       <ThemeProvider value={MyGlobalCustomTheme}>
         <SafeAreaProvider>
           <SafeAreaView
-            style={{ position: "relative", flex: 1, backgroundColor: theme.background }}
+            style={{
+              position: "relative",
+              flex: 1,
+              backgroundColor: theme.background,
+            }}
             edges={showPlaying ? ["bottom"] : ["top", "bottom"]}
           >
             <GestureHandlerRootView className="flex-1">
-              <Auth openCloseClerk={setOpenclerk}/>
+              <Auth openCloseClerk={setOpenclerk} />
               <Text
                 className={`${showPlaying ? "hidden" : "flex"} underline underline-offset-2  text-blue-400 font-lobster text-6xl text-center mt-2`}
               >
@@ -96,7 +99,7 @@ const MyGlobalCustomTheme = {
               <Stack
                 screenOptions={{
                   headerShown: false,
-                  contentStyle: { backgroundColor: theme.background  },
+                  contentStyle: { backgroundColor: theme.background },
                 }}
               />
 

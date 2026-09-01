@@ -28,12 +28,7 @@
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "permissions": [],
-      "package": "com.thapelo1.watchTv",
-       "proguardRuleOrders": ["-keep class org.slf4j.** { *; }", "-dontwarn org.slf4j.**"],
-      "launchMode": "singleTask",
-      "usesCleartextTraffic": true,
-      "networkSecurityConfig": "./network-security-config.xml",
-      "hardwareAccelerated": false
+      "package": "com.thapelo1.watchTv"
     },
     "web": {
       "bundler": "metro",
@@ -47,7 +42,18 @@
       "expo-font",
       "@clerk/expo",
       "expo-secure-store",
-      "expo-build-properties",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true,
+            "largeHeap": true,
+            "hardwareAccelerated": false,
+            "extraProguardRules": "-keep class org.slf4j.** { *; }\n-dontwarn org.slf4j.**",
+            "networkSecurityConfig": "./network-security-config.xml"
+          }
+        }
+      ],
       "expo-web-browser"
     ],
     "experiments": {
