@@ -34,7 +34,6 @@ export default function MarqeeComponent({
           {imagesArray.map((imageUrl, index) => (
             <Image
               key={index}
-              // cachePolicy="memory"
               style={{ width: 150, height: 300, borderRadius: 10, marginHorizontal: 5 }}
               source={{ uri: imageUrl.imageUrl }}
               placeholder={require("../assets/images/icon.png")}
