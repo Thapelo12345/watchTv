@@ -48,16 +48,13 @@ export default function Infor() {
   const unsubscribe = navigation.addListener('beforeRemove', (e) => {
   if(infoLocked){
 
-    console.log(`This is the info page Locked: ${infoLocked}`)
-    
     e.preventDefault();
     Alert.alert("SYSTEM NOTIFICATION","Server Still Processing your request\nPlease be pateint!... ",
       [{text: "wait", onPress: ()=> console.log("Waiting for server!.")}]
     )
       
   }//end of if
-    
-    })
+})
 
     return unsubscribe
   }, [navigation, infoLocked])
@@ -99,8 +96,8 @@ export default function Infor() {
           <ImageBackground
             className="items-center h-170 w-full relative"
             source={{uri: selected_show.programmeType === "series" ? selected_show.programme.seriesImageUrl : selected_show.programme.movieImageUrl }}
-            transition={200} // Fast-fade transition will now work perfectly here!
-            contentFit="cover" // Equivalent to resizeMode
+            transition={200} 
+            contentFit="cover"
           >
             {/* play button container */}
             <View className="m-[50%]  shadow-2xl rounded-full">

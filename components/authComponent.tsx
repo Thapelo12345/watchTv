@@ -22,7 +22,9 @@ type PROP = {
   openCloseClerk: (value: boolean) => void;
 };
 export default function Auth({ openCloseClerk }: PROP) {
-  const { isLoaded, isSignedIn, userId, signOut } = useAuth();
+  const { isLoaded, isSignedIn, userId, signOut } = useAuth({
+    treatPendingAsSignedOut: false,
+  });
   const { user } = useUser();
 
   // store static states
@@ -47,21 +49,18 @@ export default function Auth({ openCloseClerk }: PROP) {
   const verifiedUserHasData = userStore(
     (state: any) => state.setUserInitialized,
   );
-  const setImageDownloaded = useMainStore(
-    (state: any) => state.setImageDownloaded,
-  );
+  const setImageDownloaded = useMainStore((state: any) => state.setImageDownloaded,);
   const setTheme = userStore((state: any) => state.setUserTheme);
 
   // this is the store functions runing the app updates
   const setAppUpdate = useMainStore((state: any) => state.setAppUpdate);
-  const setAppUpdateMessage = useMainStore(
-    (state: any) => state.setAppUpdateMessage,
-  );
+  const setAppUpdateMessage = useMainStore((state: any) => state.setAppUpdateMessage,);
 
   const startedGettingUrls = useRef(false);
   const updateDate = useRef<string | null>(null);
 
   const appUpdatesRuning = useRef(false);
+  const loadingProgrammes = useRef(false);
 
   const [refresh, setRefresh] = useState(false);
 
@@ -71,11 +70,7 @@ export default function Auth({ openCloseClerk }: PROP) {
       const savedUpdatedate = await AsyncStorage.getItem("DATE_UPDATE");
       if (!savedUpdatedate) throw new Error("No System save Date!.");
       updateDate.current = savedUpdatedate;
-    } catch (err: unknown) {
-      const errMessage =
-        err instanceof Error ? err.message : "unknown System Error!..";
-      console.log(errMessage);
-    }
+    } catch (err: unknown) {return generateNewUpdateDate();}
   };
 
   const setUpdateDate = async (newDate: string) => {
@@ -91,14 +86,9 @@ export default function Auth({ openCloseClerk }: PROP) {
   const getSystemTheme = async () => {
     try {
       const systemTheme = await AsyncStorage.getItem("THEME");
-      if (!systemTheme) throw new Error("No save date!.");
+      if (!systemTheme) throw new Error("No save Theme data!.");
       setTheme(systemTheme);
-    } catch (err: unknown) {
-      await AsyncStorage.setItem("THEME", currentTheme);
-      console.error(
-        err instanceof Error ? err.message : "Could'nt get System Theme!.",
-      );
-    }
+    } catch (err: unknown) {await AsyncStorage.setItem("THEME", currentTheme)}
   };
 
   function generateNewUpdateDate() {
@@ -110,7 +100,7 @@ export default function Auth({ openCloseClerk }: PROP) {
     today.setDate(today.getDate() + daysLeftBeforeSunday);
     setUpdateDate(today.toISOString().split("T")[0]);
     return today.toISOString().split("T")[0];
-  }
+  }// end of generate new update date function
 
   async function downloadingImages(urls: string[]) {
     await Image.clearDiskCache();
@@ -141,7 +131,7 @@ export default function Auth({ openCloseClerk }: PROP) {
 
     if (isSignedIn && user && !userHasData) {
       getCloudUser(user.id).then(async (cloudData) => {
-        if (cloudData == "User Data NOT FOUND!.") {
+        if (cloudData === "User Data NOT FOUND!.") {
           try {
             const sendToServer = await fetch(`${mainUrl}/user/new-user`, {
               method: "PUT",
@@ -184,12 +174,19 @@ export default function Auth({ openCloseClerk }: PROP) {
     }
   }, [isSignedIn, user]);
 
+  useEffect(() => {
+    if (isSignedIn) openCloseClerk(false);
+  }, [isSignedIn, openCloseClerk]);
+
   // programe useEffect to get the latest programes from the server and update the store
   useEffect(() => {
-    if (allMovies.length === 0 && allSeries.length === 0) {
-      try {
-        getAllProgrammes();
-      } catch (err: unknown) {
+    if (
+      allMovies.length === 0 &&
+      allSeries.length === 0 &&
+      !loadingProgrammes.current
+    ) {
+      loadingProgrammes.current = true;
+      getAllProgrammes().catch((err: unknown) => {
         const errMessage =
           err instanceof Error ? err.message : "unknown server Error!...";
 
@@ -211,7 +208,7 @@ export default function Auth({ openCloseClerk }: PROP) {
             { text: "Retry", onPress: () => setRefresh((prev) => !prev) },
           ],
         );
-      }
+      });
     }
     if (allMovies.length !== 0 && allSeries.length !== 0) getLatestProgrames();
   }, [allMovies, allSeries, refresh]);  // this use effect downloads images to my device

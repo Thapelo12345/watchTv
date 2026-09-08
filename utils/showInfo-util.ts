@@ -42,8 +42,6 @@ async function Play(
   inputEpisode: string,
   playLoader: (value: boolean) => void,
 ) {
-  console.log("Play function runing!..");
-  console.log("This is the type of Show: ", showToPlay.programmeType);
 
   if (showToPlay.programmeType !== "series") {
     let currentUrl = showToPlay.programme.playingUrl;
@@ -153,14 +151,12 @@ async function upDateLickedShows(
     choosenShow.programmeType !== "series" ?
     removeMovie(choosenShow.programme.movieHeader) :
     removeSeries(choosenShow.programme.seriesHeader)
-
   } 
   else {
     // adding to users liked show
     choosenShow.programmeType !== "series" ?
     addingMovie(choosenShow.programme.movieHeader) :
     addingSeries(choosenShow.programme.seriesHeader)
-
   }
 
   try{
@@ -177,13 +173,10 @@ async function upDateLickedShows(
 
       const data = await updateCloud.json()
       if(data.message !== "Update was successfully!.") throw new Error(data.message)
-
-        console.log("SHOW ADDED SUCCESSFULLY!...")
   }//end of try Here!.
 
-  catch(err: unknown){console.log(err instanceof Error ? err.message : "unknown server Error!...")}
+  catch(err: unknown){return}
   finally{setUpLoader(false)}
-
 
 } //end of update licked shows functions
 

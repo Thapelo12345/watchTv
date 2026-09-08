@@ -115,7 +115,6 @@ const history = (userStore.getState() as {watchHistory: string[]}).watchHistory
       err instanceof Error ? err.message : "unknown server error!.";
     Alert.alert("SERVER ERROR!.", errMessage, [
       { text: "OK", onPress: () => {
-        console.log(errMessage)
         return "Failed to Delete"
       } },
     ]);
@@ -123,7 +122,6 @@ const history = (userStore.getState() as {watchHistory: string[]}).watchHistory
 } //end of delete item functions
 
 function openShow(itemName: string){
-
     const allShows = [...(useMainStore.getState() as {movies: any}).movies, ...(useMainStore.getState() as {series: any}).series]
     const selectedShows = allShows.find((show)=> show.movieHeader === itemName || show.seriesHeader === itemName)
     const showType = selectedShows.movieHeader ? "movies" : "series"

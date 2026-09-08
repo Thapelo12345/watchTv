@@ -59,12 +59,10 @@ async function search(characters: string, showType: string) {
 
   for (const show of showArray) {
     const selectedText =
-      showType === "series" ? show.seriesHeader : show.movieHeader;
+    showType === "series" ? show.seriesHeader : show.movieHeader;
 
-    if (!selectedText) {
-      console.error(`This is the value of selected text: ${selectedText}`);
-      break;
-    }
+    if (!selectedText) break;
+    
     const showHeader = selectedText.toLowerCase();
 
     let valid = true;
@@ -130,7 +128,6 @@ async function onlineSearch(programmeType: string, userInput: string) {
     ? addSeriesItem(newerShow)
     : addMovieItem(newerShow);
 
-  console.log("Calling search after receiving the new show from the server !.");
   addToSearchResults(newerShow);
   //  switching off the online search mode to hide the loader
   switchOnlineSearch();

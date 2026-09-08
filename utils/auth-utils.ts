@@ -80,7 +80,7 @@ async function getCloudUser(id: string) {
   } catch (err: unknown) {
     const errMessage =
       err instanceof Error ? err.message : "unknown server error";
-    console.error("AuthPage error\n", errMessage);
+  
     return errMessage === "Cant connect to Server!"
       ? "Internet Error!."
       : "User Data NOT FOUND!.";

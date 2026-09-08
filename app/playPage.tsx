@@ -252,7 +252,6 @@ true;
       }
     } //end of if
     else if (messageData.type === "VIDEO_HALF_REACHED") {
-      console.log("HALF TIME RUN!...");
       if (
         unFinishedShows.find(
           (show: any) => show.programmeName === currentlyPlaying.programmeName,
@@ -281,7 +280,6 @@ true;
         if (data.message !== "Cloud Updated SuccessFully!..")
           throw new Error(data.message);
 
-        console.log("CLOUD UPDATED!..");
       } catch (err: unknown) {
         console.log(err instanceof Error ? err.message : "unknown error!..");
       }
@@ -308,13 +306,8 @@ true;
 
           if (!cloudUpdate.ok) throw new Error("Failed to update cloud!..");
           const data = await cloudUpdate.json();
-          if (data.message !== "Cloud Updated SuccessFully!..")
-            throw new Error(data.message);
-        } catch (err: unknown) {
-          console.error(
-            err instanceof Error ? err.message : "unknown error!..",
-          );
-        }
+          if (data.message !== "Cloud Updated SuccessFully!..")throw new Error(data.message);
+        } catch (err: unknown) {return}
       }
 
       if (
@@ -336,17 +329,14 @@ true;
           const data = await cloudUpdate.json();
           if (data.message !== "Cloud SuccessFully Updated!.")
             throw new Error(data.message);
-        } catch (err: unknown) {
-          console.error(
-            err instanceof Error ? err.message : "unknown error!..",
-          );
-        }
+        } catch (err: unknown) {return }
       }
-    } else if (messageData.type === "VIDEO_NOT-FOUND") {
-      console.log(
-        "Video not found or link broken. Please check the URL or contact support.",
-      );
-    }
+    } 
+    // else if (messageData.type === "VIDEO_NOT-FOUND") {
+    //   console.log(
+    //     "Video not found or link broken. Please check the URL or contact support.",
+    //   );
+    // }
   };
 
   useEffect(() => {
@@ -354,7 +344,6 @@ true;
       await ScreenOrientation.lockAsync(
         ScreenOrientation.OrientationLock.PORTRAIT_UP,
       );
-      // turnOffPlay(false)
     };
 
     const backHandler = BackHandler.addEventListener(
@@ -370,8 +359,7 @@ true;
       ScreenOrientation.lockAsync(
         ScreenOrientation.OrientationLock.PORTRAIT_UP,
       );
-      if (Platform.OS === "android")
-        NavigationBar.setVisibilityAsync("visible");
+      if (Platform.OS === "android") NavigationBar.setVisibilityAsync("visible");
     };
   }, []);
 

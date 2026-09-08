@@ -27,8 +27,6 @@ async function getImageLocation(){
 async function uploadToImageKit(imageLocation: string) {
 const mainId = (userStore.getState() as {userId: string }).userId
 
-console.log("Upload to image kit function Runing!.\nAnd this is the image location: ", imageLocation)
-
     if(imageLocation === "" || !imageLocation) return { fileId: "", url: "" }; 
 
     try {
@@ -71,11 +69,9 @@ console.log("Upload to image kit function Runing!.\nAnd this is the image locati
           },
           function (err: any, result: any) {
             if (err) {
-              console.error("SDK Upload Error:\n", err);
               resolve({ fileId: "",  url: "" });
               throw new Error("Upload failed via SDK processing.");
             } else {
-              console.log("Success! Image URL is:", result.url);
               resolve({fileId: result.fileId, url: result.url})
             }
           },
@@ -102,9 +98,6 @@ async function updateCloud(
 ) {
 
 const mainId = (userStore.getState() as {userId: string }).userId
-
-console.log(`This is the user's ID: ${mainId}`)
-
   try{
 
   if(newName !== oldName && (newName !== "" && newName !== undefined)){
@@ -121,7 +114,6 @@ console.log(`This is the user's ID: ${mainId}`)
       if(data.message !== "Update was Successful!.") throw new Error("Failed to the User name!.")
         setName(newName)
   }
-  
 
   if(newProfile.imageId !== "" && newProfile.imageId !== oldProfile.imageId){
 
@@ -138,8 +130,6 @@ console.log(`This is the user's ID: ${mainId}`)
 
       const data = await sendToServer.json()
 
-      console.log("This is the message from the server!.\n", data.message)
-
       if(data.message !== "Image Updated Successfully!.") throw new Error("Failed to Upload Image!.")
 
         const cloudDelete = await fetch(`${mainUrl}/user/delete-image${oldProfile.imageId}`, {method: "DELETE"})
@@ -149,7 +139,6 @@ console.log(`This is the user's ID: ${mainId}`)
          console.log(feedback.message)
         setImage(newProfile)
   }
-  
 
 }//end of try
 catch(err: unknown){
@@ -158,7 +147,6 @@ catch(err: unknown){
   const cloudDelete = await fetch(`${mainUrl}/user/delete-image${newProfile.imageId}`, {method: "DELETE"})
   if(!cloudDelete.ok) console.error("Failed to Connect with Server!.")
 
-  console.error(errMessage)
   Alert.alert("SERVER ERROR!.", errMessage, [{text: "OK", onPress: ()=> console.log("Done!.")}])
 }
 }

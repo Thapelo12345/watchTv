@@ -18,6 +18,10 @@
     @apply text-lg font-lora text-white border-2 border-white p-0.5 px-4 rounded-lg;
   }
 
+  .social-btn {
+    @apply border-2 border-blue-400 text-black m-4 rounded-lg shadow-2xl px-4 p-2 ;
+  }
+
   .form-btn {
     @apply border border-white p-2 px-4 m-2 mx-4 text-lg rounded-lg bg-blue-400 text-white;
     box-shadow:

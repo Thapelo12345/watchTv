@@ -44,11 +44,6 @@ if(!serverResponse.ok) {
 
 const data = await serverResponse.json()
 
-console.log("Below is a message from the cloud!..")
-console.log(data.message)
-
-console.table(usersShows.userSeries)
-console.table(usersShows.userMovies)
 if(data.message) return "update done"
 
 }//end liked programme function

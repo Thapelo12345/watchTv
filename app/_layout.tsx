@@ -1,8 +1,9 @@
 import { ClerkProvider } from "@clerk/expo";
+import 'expo-crypto';
 import { DarkTheme, ThemeProvider } from "@react-navigation/native";
 import * as SecureStore from "expo-secure-store";
 import { Stack } from "expo-router";
-import { Text, Modal } from "react-native";
+import { Text } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useMainStore } from "@/stateManagement/store";
@@ -10,18 +11,15 @@ import { useEffect, useState } from "react";
 import { useFonts, Lobster_400Regular } from "@expo-google-fonts/lobster";
 import { Lora_700Bold } from "@expo-google-fonts/lora";
 import Auth from "@/components/authComponent";
-import { AuthView } from "@clerk/expo/native";
 import * as WebBrowser from "expo-web-browser";
+import ClerkComponent from "@/components/clerk";
 import { useTheme } from "@/constants/myTheme";
 import UpdateComponent from "@/components/updateComponent";
 import "../global.css";
 
 WebBrowser.maybeCompleteAuthSession();
-
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
-
-if (!publishableKey)
-  throw new Error("Add your Clerk Publishable Key to the .env file");
+if (!publishableKey) throw new Error("Add your Clerk Publishable Key to the .env file");
 
 const tokenCache = {
   async getToken(key: string) {
@@ -71,14 +69,30 @@ export default function RootLayout() {
     };
   }, []);
 
-  useEffect(() => {
-    setShowPlaying(a_show_is_playing);
-  }, [a_show_is_playing]);
+  useEffect(() => {setShowPlaying(a_show_is_playing);}, [a_show_is_playing]);
 
-  if (!fontsLoaded) return null; // Keep loading screen up until asset is ready
+  if (!fontsLoaded) {
+    return (
+      <SafeAreaProvider>
+        <SafeAreaView
+          style={{
+            flex: 1,
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: theme.background,
+          }}
+        >
+          <Text>Loading...</Text>
+        </SafeAreaView>
+      </SafeAreaProvider>
+    );
+  }
 
   return (
-    <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
+    <ClerkProvider 
+    publishableKey={publishableKey} 
+    tokenCache={tokenCache} 
+    >
       <ThemeProvider value={MyGlobalCustomTheme}>
         <SafeAreaProvider>
           <SafeAreaView
@@ -103,17 +117,7 @@ export default function RootLayout() {
                 }}
               />
 
-              <Modal
-                animationType="slide"
-                visible={openClerk}
-                presentationStyle="pageSheet"
-              >
-                <AuthView
-                  mode="signInOrUp"
-                  isDismissible={true}
-                  onDismiss={() => setOpenclerk(false)}
-                />
-              </Modal>
+             <ClerkComponent openAth={openClerk} setOpenAth={setOpenclerk} />
 
               <UpdateComponent />
             </GestureHandlerRootView>
