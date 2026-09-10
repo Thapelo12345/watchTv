@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "nestStream",
+    "name": "NestStream",
     "slug": "watchtv",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -70,7 +70,7 @@
             "clientId": "YOUR_GOOGLE_IOS_CLIENT_://googleusercontent.com"
           },
           "android": {
-            "clientId": "228985183435-31pr9oeu246s8h3t0kgb2ki4eaie42on.apps.googleusercontent.com"
+            "clientId": "://googleusercontent.com"
           }
         }
       }
@@ -80,7 +80,7 @@
       "policy": "appVersion"
     },
     "updates": {
-      "url": "https://u.expo.dev/2629bd8f-6468-4cf7-baeb-2849b9bea92f"
+      "url": "https://expo.dev"
     }
   }
 }

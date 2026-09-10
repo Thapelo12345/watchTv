@@ -5,7 +5,7 @@ import { BlurView } from "expo-blur";
 import SelectComponent from "@/components/selector";
 import { PlayIcon, HeartIcon } from "react-native-heroicons/solid";
 import CastSection from "@/components/castSection";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@clerk/expo";
 import { useMainStore } from "@/stateManagement/store";
 import { userStore } from "@/stateManagement/userStore";
@@ -52,7 +52,6 @@ export default function Infor() {
     Alert.alert("SYSTEM NOTIFICATION","Server Still Processing your request\nPlease be pateint!... ",
       [{text: "wait", onPress: ()=> console.log("Waiting for server!.")}]
     )
-      
   }//end of if
 })
 

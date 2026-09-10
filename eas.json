@@ -15,16 +15,25 @@
       },
       "channel": "development"
     },
+    "preview": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleRelease"
+      },
+      "env": {
+        "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY": "pk_test_cmVsYXRpdmUtbW9jY2FzaW4tMTU3My5jbGVyay5hY2NvdW50cy5kZXYk"
+      },
+      "channel": "preview"
+    },
     "production": {
       "distribution": "store",
-      "android": {
-        "buildType": "app-bundle"
-      },
+      "autoIncrement": true,
       "ios": {
         "simulator": false
       },
       "env": {
-        "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY": "pk_live_REPLACE_WITH_YOUR_ACTUAL_LIVE_CLERK_KEY"
+        "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY": "pk_test_cmVsYXRpdmUtbW9jY2FzaW4tMTU3My5jbGVyay5hY2NvdW50cy5kZXYk"
       },
       "channel": "production"
     }
