@@ -154,10 +154,7 @@ try{
 
     for(const show of seriesData){addNewSeries(show)}//end of 4 loop
 }
-catch(err: unknown){
-  const errMessage = err instanceof Error ? err.message : "Failed get New Series Shows!."
-  console.error(errMessage)
-}
+catch(err: unknown){return }
 
 }//end of getting new shows functions
 
