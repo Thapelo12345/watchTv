@@ -25,6 +25,7 @@ type USERTYPES = {
   userInitialized: boolean;
   userPrefferendView: string;
   userTheme: "light" | "dark";
+  userActive: boolean;
   setUserTheme: (theme: string)=> void;
   setPrefferendView: (value: string) => void;
   initializeUser: (value: Partial<USERTYPES>) => void;
@@ -43,6 +44,7 @@ type USERTYPES = {
   removeLikedMovies: (value: string) => void;
   removeUnfinishedShow: (value: string) => void;
   setUserInitialized: (value: boolean) => void;
+  setUserActive: (value: boolean)=> void;
 };
 
 export const userStore = create((set) => ({
@@ -65,6 +67,7 @@ export const userStore = create((set) => ({
   userInitialized: false,
   userPrefferendView: "all",
   userTheme: "light",
+  userActive: false,
   setUserTheme: (theme: string)=> set({userTheme: theme}),
   // store functions
   setPrefferendView: (view: string) => set({ userPrefferendView: view }),
@@ -142,4 +145,5 @@ export const userStore = create((set) => ({
       },
     })),
   setUserInitialized: (valid: boolean) => set({ userInitialized: valid }),
+  setUserActive: (newValue: boolean)=> set({userActive: newValue})
 })); //end of user store

@@ -8,13 +8,14 @@ import {
 } from "react-native-heroicons/solid";
 import SearchComponent from "@/components/searchComponent";
 import { useMainStore } from "@/stateManagement/store";
-import { useAuth } from "@clerk/expo";
+import { userStore } from "@/stateManagement/userStore";
 
 export default function TabLayout() {
-  const { isSignedIn } = useAuth();
-
   const onlineSearchOn = useMainStore((state: any) => state.onlineSearch);
-  const imagesDownloaded = useMainStore((state: any)=> state.imagesDownloaded)
+  const imagesDownloaded = useMainStore((state: any) => state.imagesDownloaded);
+
+  // store state 
+  const activeUser = userStore((state: any)=> state.userActive)
 
   return (
     <>
@@ -63,10 +64,7 @@ export default function TabLayout() {
               <TouchableOpacity
                 {...props}
                 disabled={onlineSearchOn}
-                style={[
-                  props.style,
-                  {borderRadius: 50,width: 60,},
-                ]}
+                style={[props.style, { borderRadius: 50, width: 60 }]}
                 activeOpacity={0.7}
               />
             ),
@@ -131,7 +129,7 @@ export default function TabLayout() {
             tabBarButton: (props: any) => (
               <TouchableOpacity
                 {...props}
-                disabled={!isSignedIn || !imagesDownloaded || onlineSearchOn}
+                disabled={!imagesDownloaded || onlineSearchOn || !activeUser}
                 style={[
                   props.style,
                   {

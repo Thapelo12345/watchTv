@@ -3,12 +3,10 @@ import { BlurView } from "expo-blur";
 import { v4 as uuidv4 } from "uuid";
 import { router } from "expo-router";
 import { useMainStore } from "@/stateManagement/store";
-import { userStore } from "@/stateManagement/userStore"
+import { userStore } from "@/stateManagement/userStore";
 import { PlayIcon, PlusIcon, HeartIcon } from "react-native-heroicons/solid";
 import { useState } from "react";
 import { addRemoveLikedProgramme } from "@/utils/media-utils";
-import { useAuth } from "@clerk/expo";
-import { Alert } from "react-native";
 
 type PROPS = {
   folder: string;
@@ -17,20 +15,16 @@ type PROPS = {
   show: any;
 };
 
-export default function MediaInfo({
-  folder,
-  showHeader,
-  genres,
-  show,
-}: PROPS) {
-
-  const { isLoaded, isSignedIn } = useAuth()
+export default function MediaInfo({ folder, showHeader, genres, show }: PROPS) {
   const setShow = useMainStore((state: any) => state.set_selected_show);
 
   // store states
-  const likedShows = userStore((state: any)=> state.userLiked)
+  const likedShows = userStore((state: any) => state.userLiked);
+  const activeUser = userStore((state: any)=> state.userActive)
 
-  const lickedUnlicked = likedShows.userSeries.includes(showHeader) || likedShows.userMovies.includes(showHeader)
+  const lickedUnlicked =
+    likedShows.userSeries.includes(showHeader) ||
+    likedShows.userMovies.includes(showHeader);
   const [waitForserver, setWaitForServer] = useState(false);
 
   return (
@@ -44,12 +38,13 @@ export default function MediaInfo({
       </Text>
 
       <View className="flex flex-row mx-4">
-        {genres !== undefined && genres.map((genre) => (
-          <Text className="text-white font-lora text-lg" key={uuidv4()}>
-            {" "}
-            {genre}
-          </Text>
-        ))}
+        {genres !== undefined &&
+          genres.map((genre) => (
+            <Text className="text-white font-lora text-lg" key={uuidv4()}>
+              {" "}
+              {genre}
+            </Text>
+          ))}
       </View>
 
       <View className="p-2flex flex-row">
@@ -68,15 +63,7 @@ export default function MediaInfo({
 
         <Pressable
           onPress={async () => {
-            if(!isLoaded) return
-
-            if(!isSignedIn){
-              Alert.alert("APP LOCKED!.", "Cant Add Shows Without an account!.",
-                [{text: "OK", onPress: ()=> console.log("Locked!")}]
-              )
-              return
-            }
-            if (waitForserver) return;
+            if (waitForserver || !activeUser) return;
 
             setWaitForServer(true);
 

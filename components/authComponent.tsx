@@ -1,13 +1,11 @@
-import { View, Text, Pressable, Platform } from "react-native";
+import { View, Text, Pressable, Platform, Modal } from "react-native";
 import { Alert } from "react-native";
 import { Image } from "expo-image";
-import { useAuth, useUser } from "@clerk/expo";
 import { UserCircleIcon } from "react-native-heroicons/solid";
 import { useMainStore } from "@/stateManagement/store";
 import { userStore } from "@/stateManagement/userStore";
 import {
   getCloudUser,
-  extractUserInfo,
   getAllProgrammes,
   getLatestProgrames,
   getNewShows,
@@ -16,23 +14,18 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { BackHandler } from "react-native";
 import RNExitApp from "react-native-exit-app";
+import { makeRedirectUri } from "expo-auth-session";
 import { useEffect, useRef, useState } from "react";
+import { supabase } from "@/lib/lib/supabase";
 
-type PROP = {
-  openCloseClerk: (value: boolean) => void;
-};
-export default function Auth({ openCloseClerk }: PROP) {
-  const { isLoaded, isSignedIn, userId, signOut } = useAuth({
-    treatPendingAsSignedOut: false,
-  });
-  const { user } = useUser();
+export default function Auth() {
+  const redirectTo = makeRedirectUri();
 
   // store static states
   const mainUserName = userStore((state: any) => state.userName);
-  const initializeCurrentUser = userStore((state: any) => state.initializeUser);
   const profileImage = userStore((state: any) => state.profilePicture);
-  const userHasData = userStore((state: any) => state.userInitialized);
 
+  const userHasData = userStore((state: any) => state.userInitialized);
   const currentTheme = userStore((state: any) => state.userTheme);
 
   const allMovies = useMainStore((state: any) => state.movies);
@@ -41,20 +34,21 @@ export default function Auth({ openCloseClerk }: PROP) {
   const latestMovies = useMainStore((state: any) => state.latestMovies);
   const latestSeries = useMainStore((state: any) => state.latestSeries);
 
-  const mainUrl = useMainStore((state: any) => state.baseUrl);
   const mediaFilePlaying = useMainStore((state: any) => state.playing);
   const imagesDownloaded = useMainStore((state: any) => state.imagesDownloaded);
 
+  const activeUser = userStore((state: any)=> state.userActive)
+
   // store action states
-  const verifiedUserHasData = userStore(
-    (state: any) => state.setUserInitialized,
-  );
-  const setImageDownloaded = useMainStore((state: any) => state.setImageDownloaded,);
+  const setImageDownloaded = useMainStore((state: any) => state.setImageDownloaded);
   const setTheme = userStore((state: any) => state.setUserTheme);
+
+  const setOpenAuthModal = useMainStore((state: any)=> state.setOpenAuthModal)
+  const setActiveUser = userStore((state: any) => state.setUserActive)
 
   // this is the store functions runing the app updates
   const setAppUpdate = useMainStore((state: any) => state.setAppUpdate);
-  const setAppUpdateMessage = useMainStore((state: any) => state.setAppUpdateMessage,);
+  const setAppUpdateMessage = useMainStore((state: any) => state.setAppUpdateMessage);
 
   const startedGettingUrls = useRef(false);
   const updateDate = useRef<string | null>(null);
@@ -70,7 +64,9 @@ export default function Auth({ openCloseClerk }: PROP) {
       const savedUpdatedate = await AsyncStorage.getItem("DATE_UPDATE");
       if (!savedUpdatedate) throw new Error("No System save Date!.");
       updateDate.current = savedUpdatedate;
-    } catch (err: unknown) {return generateNewUpdateDate();}
+    } catch (err: unknown) {
+      return generateNewUpdateDate();
+    }
   };
 
   const setUpdateDate = async (newDate: string) => {
@@ -88,19 +84,20 @@ export default function Auth({ openCloseClerk }: PROP) {
       const systemTheme = await AsyncStorage.getItem("THEME");
       if (!systemTheme) throw new Error("No save Theme data!.");
       setTheme(systemTheme);
-    } catch (err: unknown) {await AsyncStorage.setItem("THEME", currentTheme)}
+    } catch (err: unknown) {
+      await AsyncStorage.setItem("THEME", currentTheme);
+    }
   };
 
   function generateNewUpdateDate() {
     const today = new Date("2026-08-17");
     const day = today.getDay();
-    //if day is zero then its sunday
     const daysLeftBeforeSunday = 7 - day;
 
     today.setDate(today.getDate() + daysLeftBeforeSunday);
     setUpdateDate(today.toISOString().split("T")[0]);
     return today.toISOString().split("T")[0];
-  }// end of generate new update date function
+  } // end of generate new update date function
 
   async function downloadingImages(urls: string[]) {
     await Image.clearDiskCache();
@@ -123,61 +120,24 @@ export default function Auth({ openCloseClerk }: PROP) {
   useEffect(() => {
     getSystemTheme();
     getUpdateDate();
-  }, []);
+  }, [activeUser]);
 
-  // use auth useEffect to check if the user is signed in and has data, if not get the data from the server and initialize the user store
-  useEffect(() => {
-    if (!isLoaded || userHasData) return;
+  // This is an auth useEffect
+  /*
+  useEffect(()=>{
+    const checkInitialSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session) {
+      const loggedInUser = session.user
+      await getCloudUser(loggedInUser.id)
+      setActiveUser(true)
 
-    if (isSignedIn && user && !userHasData) {
-      getCloudUser(user.id).then(async (cloudData) => {
-        if (cloudData === "User Data NOT FOUND!.") {
-          try {
-            const sendToServer = await fetch(`${mainUrl}/user/new-user`, {
-              method: "PUT",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                name: user.username ?? user.firstName ?? "User",
-                id: user.id,
-                email: user.primaryEmailAddress?.emailAddress ?? "",
-                image: user.imageUrl,
-                imageId: "",
-              }),
-            });
-
-            if (!sendToServer.ok)
-              throw new Error(
-                "Failed to Connect to Server!.\nCheck YOUR INTERNET connection and try again.",
-              );
-
-            const data = await sendToServer.json();
-            if (data.message !== "User created successfully!..")
-              throw new Error(data.message);
-
-            initializeCurrentUser(extractUserInfo(data.newUser));
-            verifiedUserHasData(true);
-          } catch (err: unknown) {
-            const errMessage =
-              err instanceof Error ? err.message : "unknown Server Error!.";
-            Alert.alert("SERVER ERROR!.", errMessage, [
-              { text: "OK", onPress: () => signOut() },
-            ]);
-          } //end of catch
-        } else if (cloudData === "Internet Error!.") {
-          Alert.alert(
-            "SERVER ERROR!.",
-            "The seem to be a problem with Your Internet Connection!.\n YOU'LL BE SIGNED OUT! TRY AGAIN.",
-            [{ text: "OK", onPress: () => signOut() }],
-          );
-        } else return;
-      });
+    }//end of if
     }
-  }, [isSignedIn, user]);
 
-  useEffect(() => {
-    if (isSignedIn) openCloseClerk(false);
-  }, [isSignedIn, openCloseClerk]);
-
+    checkInitialSession()
+  }, [])
+*/
   // programe useEffect to get the latest programes from the server and update the store
   useEffect(() => {
     if (
@@ -186,32 +146,35 @@ export default function Auth({ openCloseClerk }: PROP) {
       !loadingProgrammes.current
     ) {
       loadingProgrammes.current = true;
-      getAllProgrammes().catch((err: unknown) => {
-        const errMessage =
-          err instanceof Error ? err.message : "unknown server Error!...";
 
-        console.error(errMessage);
-        Alert.alert(
-          "SERVER ERROR!.",
-          "Failed To Get Data From the Server\nApp Is Being Closed!..",
-          [
-            {
-              text: "Close App",
-              onPress: () =>{
+      console.log("Starting to get All Shows!.");
+      getAllProgrammes()
+        .then(() => console.log("Shows Recieved!,"))
+        .catch((err: unknown) => {
+          const errMessage =
+            err instanceof Error ? err.message : "unknown server Error!...";
 
-                Platform.OS === "android"
-                  ? BackHandler.exitApp()
-                  : RNExitApp.exitApp()
-                  console.log("App is Being Closed!..")
-                }
-            },
-            { text: "Retry", onPress: () => setRefresh((prev) => !prev) },
-          ],
-        );
-      });
+          console.error(errMessage);
+          Alert.alert(
+            "SERVER ERROR!.",
+            "Failed To Get Data From the Server\nApp Is Being Closed!..",
+            [
+              {
+                text: "Close App",
+                onPress: () => {
+                  Platform.OS === "android"
+                    ? BackHandler.exitApp()
+                    : RNExitApp.exitApp();
+                  console.log("App is Being Closed!..");
+                },
+              },
+              { text: "Retry", onPress: () => setRefresh((prev) => !prev) },
+            ],
+          );
+        });
     }
     if (allMovies.length !== 0 && allSeries.length !== 0) getLatestProgrames();
-  }, [allMovies, allSeries, refresh]);  // this use effect downloads images to my device
+  }, [allMovies, allSeries, refresh]); // this use effect downloads images to my device
 
   useEffect(() => {
     if (
@@ -269,14 +232,14 @@ export default function Auth({ openCloseClerk }: PROP) {
     <View
       className={`${mediaFilePlaying ? "hidden" : "visible"} flex flex-row items-center justify-end w-[99%] mx-0.5 rounded-lg gap-x-4 bg-blue-400 h-14 p-2`}
     >
-      {isSignedIn && (
+      {userHasData && (
         <Text className="text-white mr-11 text-[17px] font-extrabold">
           {mainUserName}
         </Text>
       )}
 
       <View className="border border-white overflow-hidden flex items-center justify-center rounded-full w-10 h-full">
-        {!isSignedIn || !profileImage?.imageUrl ? (
+        {!userHasData || !profileImage?.imageUrl ? (
           <UserCircleIcon color="white" size={30} />
         ) : (
           <Image
@@ -291,12 +254,20 @@ export default function Auth({ openCloseClerk }: PROP) {
       </View>
 
       <Pressable
-        onPress={() => {
-          if (!isSignedIn) openCloseClerk(true);
-          else signOut();
+        onPress={async () => {
+        if(!activeUser) setOpenAuthModal(true)
+        else{
+           const { error } = await supabase.auth.signOut()
+          if (error) {
+            Alert.alert("LOGOUT ERROR!.", error.message)
+            return
+          }
+
+          setActiveUser(false)
+        }
         }}
       >
-        <Text className="auth-btn">Sign {isSignedIn ? "Out" : "In"}</Text>
+        <Text className="auth-btn">Sign {activeUser ? "Out" : "In"}</Text>
       </Pressable>
     </View>
   );

@@ -30,7 +30,7 @@
     text-shadow: 1px 1px 2px black;
   }
   .page-containers {
-    @apply flex flex-col items-center justify-evenly;
+    @apply flex flex-1 flex-col items-center justify-evenly;
   }
   .pageHeaders {
     @apply text-white shadow-2xl shadow-black w-fit font-lobster bg-blue-400 text-2xl text-center p-2 px-6 rounded-lg mb-2 mt-5;

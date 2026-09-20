@@ -90,7 +90,7 @@ const mainId = (userStore.getState() as {userId: string }).userId
 } //end of get file image
 
 
-async function updateCloud(
+async function updateAvatarAndName(
   newName: string,
   oldName: string,
   newProfile: { imageId: string; imageUrl: string },
@@ -100,6 +100,7 @@ async function updateCloud(
 const mainId = (userStore.getState() as {userId: string }).userId
   try{
 
+  // this if statement is for setting the user's name 
   if(newName !== oldName && (newName !== "" && newName !== undefined)){
     const sendToServer = await fetch(`${mainUrl}/user/update-user-name${mainId}`, {
       method: "POST",
@@ -112,11 +113,13 @@ const mainId = (userStore.getState() as {userId: string }).userId
       const data = await sendToServer.json()
 
       if(data.message !== "Update was Successful!.") throw new Error("Failed to the User name!.")
-        setName(newName)
+      setName(newName)
   }
 
+  // this is statement is to set the user's profile picture
   if(newProfile.imageId !== "" && newProfile.imageId !== oldProfile.imageId){
 
+    // here i am updating the current image
     const sendToServer = await fetch(`${mainUrl}/user/update-user-image${mainId}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -136,9 +139,13 @@ const mainId = (userStore.getState() as {userId: string }).userId
         if(!cloudDelete.ok) throw new Error("Failed to Connect with Server!.")
 
          const feedback = await cloudDelete.json()
-         console.log(feedback.message)
         setImage(newProfile)
   }
+
+  // If the no image id
+  else{
+    
+  }//end of else
 
 }//end of try
 catch(err: unknown){
@@ -151,4 +158,4 @@ catch(err: unknown){
 }
 }
 
-export { updateCloud, getImageLocation, uploadToImageKit };
+export { updateAvatarAndName, getImageLocation, uploadToImageKit };

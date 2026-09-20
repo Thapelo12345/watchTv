@@ -25,6 +25,7 @@ type STORETYPES = {
   appUpdating: boolean;
   appUpdateMessage: string | null;
   showInfoLocked: boolean;
+  openAuthModal: boolean;
 
   setShowInfoLocked: (value: boolean)=> void;
   setAppUpdate: (value: boolean) => void;
@@ -51,12 +52,12 @@ type STORETYPES = {
   setOnlineSearch: () => void;
   switchAppLoding: () => void;
   setUserStatus: (newStatus: string) => void; 
+  setOpenAuthModal: (newValue: boolean)=> void;
 };
 
 // Applied STORETYPES to enforce strict compile-time checks
 export const useMainStore = create<STORETYPES>((set) => ({
   // baseUrl: "http://192.168.18.7:5000",
-  
   baseUrl: "https://neststream-server.onrender.com",
   
   movies: [],
@@ -77,6 +78,7 @@ export const useMainStore = create<STORETYPES>((set) => ({
   appUpdating: false,
   appUpdateMessage: null,
   showInfoLocked: false,
+  openAuthModal: false,
 
   setShowInfoLocked: (isLocked: boolean)=> set({showInfoLocked: isLocked}),
   setAppUpdate: (validate) => set({ appUpdating: validate }),
@@ -151,4 +153,5 @@ export const useMainStore = create<STORETYPES>((set) => ({
   clearSearchResults: () => set({ searchResults: [] }),
   setUserStatus: (newStatus) => set({ userStatus: newStatus } as any),
   switchAppLoding: () => set((state) => ({ appLoading: !state.appLoading })),
+  setOpenAuthModal: (newValue: boolean)=> set({openAuthModal: newValue})
 }));

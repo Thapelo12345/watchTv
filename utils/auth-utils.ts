@@ -1,5 +1,7 @@
 import { useMainStore } from "@/stateManagement/store";
 import { userStore } from "@/stateManagement/userStore";
+import { supabase } from "@/lib/lib/supabase";
+import { Alert } from "react-native";
 
 // store sates here
 const mainUrl = (useMainStore.getState() as { baseUrl: string }).baseUrl;
@@ -60,12 +62,9 @@ function extractUserInfo(data: any){
 }
 
 async function getCloudUser(id: string) {
-  console.log("Runing Getting Cloud User!.");
 
   try {
-    const serverResponse = await fetch(`${mainUrl}/user/find-User${id}`, {
-      method: "GET",
-    });
+    const serverResponse = await fetch(`${mainUrl}/user/find-User${id}`, {method: "GET"});
 
     if (!serverResponse.ok) throw new Error("Cant connect to Server!");
 
@@ -76,14 +75,15 @@ async function getCloudUser(id: string) {
     initializeCurrentUser(extractUserInfo(data.matchingUser));
     verifiedUserHasData(true);
 
-    return "User Data FOUND!.";
   } catch (err: unknown) {
     const errMessage =
       err instanceof Error ? err.message : "unknown server error";
   
-    return errMessage === "Cant connect to Server!"
+    errMessage === "Cant connect to Server!"
       ? "Internet Error!."
       : "User Data NOT FOUND!.";
+
+      Alert.alert("USER DETAILS ERROR!", errMessage)
   }
 } //end of get cloud use r function
 

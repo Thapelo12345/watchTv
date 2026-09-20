@@ -39,8 +39,6 @@
       "expo-router",
       "expo-video",
       "expo-font",
-      "@clerk/expo",
-      "@clerk/expo-google-signin",
       "expo-secure-store",
       [
         "expo-build-properties",
@@ -63,16 +61,6 @@
       "router": {},
       "eas": {
         "projectId": "2629bd8f-6468-4cf7-baeb-2849b9bea92f"
-      },
-      "clerk": {
-        "google": {
-          "ios": {
-            "clientId": "YOUR_GOOGLE_IOS_CLIENT_://googleusercontent.com"
-          },
-          "android": {
-            "clientId": "://googleusercontent.com"
-          }
-        }
       }
     },
     "owner": "thapelo1",

@@ -6,7 +6,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import ImageUpdate from "./imageUpdate";
-import { getImageLocation, updateCloud, uploadToImageKit } from "@/utils/update-utils";
+import { getImageLocation, updateAvatarAndName, uploadToImageKit } from "@/utils/update-utils";
 import { userStore } from "@/stateManagement/userStore";
 import { useState, useRef, useEffect } from "react";
 import { useTheme } from "@/constants/myTheme";
@@ -59,7 +59,7 @@ export default function UpdateUserInfor() {
             setLoad(true)
             const profile = currentImageUrl === "" ? {fileId: "", url: ""} : await uploadToImageKit(currentImageUrl)
 
-            updateCloud(
+            updateAvatarAndName(
               inputName,
               currentUser,
               { imageId: profile.fileId, imageUrl: profile.url },
@@ -67,6 +67,7 @@ export default function UpdateUserInfor() {
             )
 
             setLoad(false)
+            setCurrentImageUrl("../assets/images/cast-default.png")
         }
           }
         >

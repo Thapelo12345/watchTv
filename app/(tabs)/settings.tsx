@@ -1,23 +1,24 @@
 import { View, Text, Switch } from "react-native";
 import UpdateUserInfor from "@/components/UserInfoUpdate";
 import ListContainer from "@/components/list-container";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import { useAuth } from "@clerk/expo";
-import { router } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
 import ThemeToggle from "@/components/ui/themeToogle";
 import { useTheme } from "@/constants/myTheme";
 import { useEffect } from "react";
+import { userStore } from "@/stateManagement/userStore";
+import { usePathname } from 'expo-router';
+import { router } from "expo-router";
 
 export default function Settings() {
   const theme = useTheme();
-  const { isLoaded, isSignedIn } = useAuth();
+  const pathname = usePathname();
 
-useEffect(()=>{
+  const activeUser = userStore((state: any)=> state.userActive)
 
-  if(!isLoaded) return
-  if(!isSignedIn) router.navigate("/")
-    
-}, [isSignedIn])
+  useEffect(() => {
+    if(pathname === "/settings" && !activeUser) router.navigate("/")
+  }, [activeUser]);
+
   return (
     <View className="flex-1 w-screen h-screen">
       <SafeAreaView
@@ -30,7 +31,6 @@ useEffect(()=>{
         <UpdateUserInfor />
         <ListContainer />
         <ThemeToggle />
-        
       </SafeAreaView>
     </View>
   );

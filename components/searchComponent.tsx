@@ -4,27 +4,24 @@ import { usePathname } from "expo-router";
 import { useEffect, useState } from "react";
 import { search, onlineSearch } from "@/utils/search-utils";
 import { useMainStore } from "@/stateManagement/store";
-import { useAuth } from "@clerk/expo";
+import { userStore } from "@/stateManagement/userStore";
 import { useTheme } from "@/constants/myTheme";
 
 export default function SearchComponent() {
   const theme = useTheme();
   const pathname = usePathname();
-  const { isLoaded, isSignedIn } = useAuth();
-
   const onlineSearchOn = useMainStore((state: any) => state.onlineSearch);
 
   const searchResult = useMainStore((state: any) => state.searchResults);
-  const emptySearchResults = useMainStore(
-    (state: any) => state.clearSearchResults,
-  );
+  const emptySearchResults = useMainStore((state: any) => state.clearSearchResults);
+
+  // store action state
+  const activeUser = userStore((state: any)=> state.userActive)
 
   const [hide, setHide] = useState(true);
   const [searchText, setSearhText] = useState("");
 
-  function resetInput() {
-    setSearhText("");
-  }
+  function resetInput() {setSearhText("")}
 
   useEffect(() => {
     if ((pathname === "/" || pathname === "/settings") && !hide) setHide(true);
@@ -61,14 +58,12 @@ export default function SearchComponent() {
       <Pressable
         className="bg-blue-400 p-2 rounded-md"
         onPress={async () => {
-          if (!isLoaded || onlineSearchOn) return;
-          Keyboard.dismiss()
-          if (!isSignedIn) {
-            Alert.alert("APP LOCKED!.", "Your must Login First!.", [
-              { text: "OK", onPress: () => console.log("User Blocked!") },
-            ]);
-            return;
+          if (onlineSearchOn) return;
+          if(!activeUser) {
+            Alert.alert("APP LOCKED!", "You have to login before Searching!.")
+            return
           }
+          Keyboard.dismiss();
           const typeOfShow = pathname === "/series" ? "series" : "movies";
           onlineSearch(typeOfShow, searchText);
         }}

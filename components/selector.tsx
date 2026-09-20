@@ -2,8 +2,8 @@ import { Text, Pressable, View, ActivityIndicator, Alert } from "react-native";
 import DropDown from "./dropDown";
 import { PlusIcon } from "react-native-heroicons/solid";
 import { useMainStore } from "@/stateManagement/store";
+import { userStore } from "@/stateManagement/userStore";
 import { useEffect, useState } from "react";
-import { useAuth } from "@clerk/expo";
 
 type PROPS = {
   showTitle: string;
@@ -28,47 +28,48 @@ export default function SelectComponent({
   setSeason,
   setEpisode,
 }: PROPS) {
-  const { isLoaded, isSignedIn } = useAuth();
-
   // store solid state
   const baseUrl = useMainStore((state: any) => state.baseUrl);
-  const infoLocked = useMainStore((state: any)=> state.showInfoLocked)
+  const infoLocked = useMainStore((state: any) => state.showInfoLocked);
+  const activeUser = userStore((state: any)=> state.userActive)
 
   // store action state
   const addToMainSeries = useMainStore((state: any) => state.addSeasonToSeries);
-  const lockInfoPage = useMainStore((state: any)=> state.setShowInfoLocked)
+  const lockInfoPage = useMainStore((state: any) => state.setShowInfoLocked);
 
-  const [allSeasons, setAllSeasons] = useState<any[]>([])
+  const [allSeasons, setAllSeasons] = useState<any[]>([]);
 
   const [openSeasonDropDown, setSeasonDropDown] = useState(false);
   const [openEpisodeDropDown, setEpisodeDropDown] = useState(false);
 
   const [allEpisode, setAllEpisode] = useState<string[]>([]);
 
-  // this useEffect will signal for server close
-  useEffect(()=>{}, [])
-
-  useEffect(()=>{
-    if(allSeasons.length !== 0 || !seasonsEpisode || seasonsEpisode.length === 0) return
-    const tempSeasons = seasonsEpisode.map((currentSeason) => currentSeason.season)
-    setAllSeasons(tempSeasons)
-  }, [])
+  useEffect(() => {
+    if (
+      allSeasons.length !== 0 ||
+      !seasonsEpisode ||
+      seasonsEpisode.length === 0
+    )
+      return;
+    const tempSeasons = seasonsEpisode.map(
+      (currentSeason) => currentSeason.season,
+    );
+    setAllSeasons(tempSeasons);
+  }, []);
 
   useEffect(() => {
-
-    if(!seasonsEpisode || seasonsEpisode.length === 0) return
+    if (!seasonsEpisode || seasonsEpisode.length === 0) return;
 
     const activeSeason = seasonsEpisode.find(
       (season) => season.season == selectedSeason,
     );
 
-    if(!activeSeason) return
+    if (!activeSeason) return;
 
     const episodeArray = activeSeason.episodes.map(
       (episode: any) => episode.name,
     );
     setAllEpisode(episodeArray);
-
   }, [selectedSeason]);
 
   return (
@@ -122,19 +123,10 @@ export default function SelectComponent({
         ) : (
           <Pressable
             onPress={async () => {
-              if (!isLoaded) return;
-
-              if (!isSignedIn) {
-                Alert.alert(
-                  "APP LOCKED!.",
-                  "You Need an account first, Before you can Add a new Series show",
-                  [{ text: "OK", onPress: () => console.log("App Locked!.") }],
-                );
-                return;
-              }
+              if(!activeUser) return
 
               // here i am lockng the infor page it deos send other request to server
-              lockInfoPage(true)
+              lockInfoPage(true);
               setaddingSeason(true);
 
               const response = await fetch(`${baseUrl}/series/add-season`, {
@@ -147,10 +139,15 @@ export default function SelectComponent({
                 Alert.alert(
                   "BROBLEM WITH THE SERVER",
                   "failed to connect with server!...",
-                  [{ text: "OK", onPress: () => {
-                    lockInfoPage(false)
-                    setaddingSeason(false)
-                  } }],
+                  [
+                    {
+                      text: "OK",
+                      onPress: () => {
+                        lockInfoPage(false);
+                        setaddingSeason(false);
+                      },
+                    },
+                  ],
                 );
                 return;
               }
@@ -159,10 +156,13 @@ export default function SelectComponent({
 
               if (seasonData.message !== "Season Retrived successfully!.") {
                 Alert.alert("SEARCH RESULTS", seasonData.message, [
-                  { text: "OK", onPress: () => {
-                    lockInfoPage(false)
-                    setaddingSeason(false)
-                  } },
+                  {
+                    text: "OK",
+                    onPress: () => {
+                      lockInfoPage(false);
+                      setaddingSeason(false);
+                    },
+                  },
                 ]);
                 return;
               }
@@ -170,11 +170,15 @@ export default function SelectComponent({
               // this adds the new season to the main series array
               addToMainSeries(showTitle, seasonData.nextSeason);
 
-              setAllSeasons((prev)=>[...prev, seasonData.nextSeason.season])
-              setAllEpisode(seasonData.nextSeason.episodes.map((episode: any)=> episode.name));
+              setAllSeasons((prev) => [...prev, seasonData.nextSeason.season]);
+              setAllEpisode(
+                seasonData.nextSeason.episodes.map(
+                  (episode: any) => episode.name,
+                ),
+              );
 
               setSeason(seasonData.nextSeason.season);
-              lockInfoPage(false)
+              lockInfoPage(false);
               setaddingSeason(false);
             }}
           >

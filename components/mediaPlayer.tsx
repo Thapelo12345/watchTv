@@ -1,6 +1,7 @@
 import { View, ActivityIndicator } from "react-native";
 import { Image } from "expo-image";
 import { useMainStore } from "@/stateManagement/store";
+import { userStore } from "@/stateManagement/userStore";
 import { useEffect, useState, useRef } from "react";
 import MediaInfo from "./ui/mediaInf";
 

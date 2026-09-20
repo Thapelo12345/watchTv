@@ -340,17 +340,16 @@ true;
   };
 
   useEffect(() => {
-    const backAction = async () => {
-      await ScreenOrientation.lockAsync(
+    const backAction = () => {
+      ScreenOrientation.lockAsync(
         ScreenOrientation.OrientationLock.PORTRAIT_UP,
       );
+      return true;
     };
 
     const backHandler = BackHandler.addEventListener(
       "hardwareBackPress",
-      () => {
-        backAction();
-      },
+      backAction,
     );
 
     return () => {

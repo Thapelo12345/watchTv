@@ -1,7 +1,5 @@
-import { ClerkProvider } from "@clerk/expo";
 import 'expo-crypto';
 import { DarkTheme, ThemeProvider } from "@react-navigation/native";
-import * as SecureStore from "expo-secure-store";
 import { Stack } from "expo-router";
 import { Text } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
@@ -10,35 +8,14 @@ import { useMainStore } from "@/stateManagement/store";
 import { useEffect, useState } from "react";
 import { useFonts, Lobster_400Regular } from "@expo-google-fonts/lobster";
 import { Lora_700Bold } from "@expo-google-fonts/lora";
-import Auth from "@/components/authComponent";
 import * as WebBrowser from "expo-web-browser";
-import ClerkComponent from "@/components/clerk";
 import { useTheme } from "@/constants/myTheme";
 import UpdateComponent from "@/components/updateComponent";
+import Auth from "@/components/authComponent";
+import SuperBaseAuth from '@/components/superBaseAuth';
 import "../global.css";
 
 WebBrowser.maybeCompleteAuthSession();
-const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
-if (!publishableKey) throw new Error("Add your Clerk Publishable Key to the .env file");
-
-const tokenCache = {
-  async getToken(key: string) {
-    try {
-      const item = await SecureStore.getItemAsync(key);
-      return item;
-    } catch (error) {
-      await SecureStore.deleteItemAsync(key);
-      return null;
-    }
-  },
-  async saveToken(key: string, value: string) {
-    try {
-      return SecureStore.setItemAsync(key, value);
-    } catch (err) {
-      return;
-    }
-  },
-};
 
 export default function RootLayout() {
   const theme = useTheme();
@@ -58,7 +35,6 @@ export default function RootLayout() {
 
   const a_show_is_playing = useMainStore((state: any) => state.playing);
 
-  const [openClerk, setOpenclerk] = useState(false);
   const [showPlaying, setShowPlaying] = useState(false);
 
   // warming up the browser
@@ -89,10 +65,7 @@ export default function RootLayout() {
   }
 
   return (
-    <ClerkProvider 
-    publishableKey={publishableKey} 
-    tokenCache={tokenCache} 
-    >
+      <>
       <ThemeProvider value={MyGlobalCustomTheme}>
         <SafeAreaProvider>
           <SafeAreaView
@@ -104,7 +77,7 @@ export default function RootLayout() {
             edges={showPlaying ? ["bottom"] : ["top", "bottom"]}
           >
             <GestureHandlerRootView className="flex-1">
-              <Auth openCloseClerk={setOpenclerk} />
+              <Auth />
               <Text
                 className={`${showPlaying ? "hidden" : "flex"} underline underline-offset-2  text-blue-400 font-lobster text-6xl text-center mt-2`}
               >
@@ -117,13 +90,12 @@ export default function RootLayout() {
                 }}
               />
 
-             <ClerkComponent openAth={openClerk} setOpenAth={setOpenclerk} />
-
               <UpdateComponent />
+              <SuperBaseAuth />
             </GestureHandlerRootView>
           </SafeAreaView>
         </SafeAreaProvider>
       </ThemeProvider>
-    </ClerkProvider>
+      </>
   );
 }
