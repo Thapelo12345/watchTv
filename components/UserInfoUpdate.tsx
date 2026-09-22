@@ -6,7 +6,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import ImageUpdate from "./imageUpdate";
-import { getImageLocation, updateAvatarAndName, uploadToImageKit } from "@/utils/update-utils";
+import { getImageLocation, updateUserName, updateAvatar, uploadToImageKit } from "@/utils/update-utils";
 import { userStore } from "@/stateManagement/userStore";
 import { useState, useRef, useEffect } from "react";
 import { useTheme } from "@/constants/myTheme";
@@ -18,15 +18,14 @@ export default function UpdateUserInfor() {
   const userProfile = userStore((state: any) => state.profilePicture);
   const currentUser = userStore((state: any) => state.userName);
 
-  const [currentImageUrl, setCurrentImageUrl] = useState(userProfile.imageUrl);
-  const imageId = useRef(userProfile.imageId);
+  const [currentImageUrl, setCurrentImageUrl] = useState("");
   const [load, setLoad] = useState(false);
   const [inputName, setInputName] = useState(currentUser);
 
   useEffect(()=>{setCurrentImageUrl(userProfile.url)}, [userProfile])
 
   return (
-    <View className="flex items-center  justify-center  m-2 p-2 mx-auto w-[70%] h-fit  rounded-lg">
+    <View className="flex items-center justify-center m-2 p-2 mx-auto w-full h-fit rounded-lg">
       <Pressable
         onPress={async () => {
           setLoad(true);
@@ -39,9 +38,8 @@ export default function UpdateUserInfor() {
         <ImageUpdate inputUrl={currentImageUrl} />
       </Pressable>
 
-      {/* <ImageUpdate /> */}
       <TextInput
-        className="p-2 m-2 text-black rounded-lg border-4 border-white w-full shadow-lg"
+        className="p-2 m-2 text-black rounded-lg border-4 border-white w-1/2 shadow-lg"
         value={inputName}
         onChangeText={(text) => setInputName(text)}
         style={{
@@ -55,22 +53,15 @@ export default function UpdateUserInfor() {
       ) : (
         <Pressable
           onPress={async () =>{
+           setLoad(true)
 
-            setLoad(true)
-            const profile = currentImageUrl === "" ? {fileId: "", url: ""} : await uploadToImageKit(currentImageUrl)
-
-            updateAvatarAndName(
-              inputName,
-              currentUser,
-              { imageId: profile.fileId, imageUrl: profile.url },
-              userProfile,
-            )
-
-            setLoad(false)
-            setCurrentImageUrl("../assets/images/cast-default.png")
-        }
-          }
-        >
+            if(inputName !== currentUser) await updateUserName(inputName)
+            if(currentImageUrl !== "") await  updateAvatar(currentImageUrl)
+          
+           setCurrentImageUrl("")
+           setInputName(currentUser)
+           setLoad(false)
+          }}>
           <Text className="p-2 border-4 border-white m-4 rounded-lg"
           style={{
           color: theme.text,
