@@ -6,9 +6,9 @@ import {
   ActivityIndicator,
 } from "react-native";
 import ImageUpdate from "./imageUpdate";
-import { getImageLocation, updateUserName, updateAvatar, uploadToImageKit } from "@/utils/update-utils";
+import { getImageLocation, updateUserName, updateAvatar } from "@/utils/update-utils";
 import { userStore } from "@/stateManagement/userStore";
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useTheme } from "@/constants/myTheme";
 
 export default function UpdateUserInfor() {
@@ -23,6 +23,7 @@ export default function UpdateUserInfor() {
   const [inputName, setInputName] = useState(currentUser);
 
   useEffect(()=>{setCurrentImageUrl(userProfile.url)}, [userProfile])
+  useEffect(()=>{setInputName(currentUser)},[currentUser])
 
   return (
     <View className="flex items-center justify-center m-2 p-2 mx-auto w-full h-fit rounded-lg">

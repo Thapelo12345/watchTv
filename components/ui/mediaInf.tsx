@@ -1,6 +1,5 @@
 import { Text, View, Pressable } from "react-native";
 import { BlurView } from "expo-blur";
-import { v4 as uuidv4 } from "uuid";
 import { router } from "expo-router";
 import { useMainStore } from "@/stateManagement/store";
 import { userStore } from "@/stateManagement/userStore";
@@ -20,12 +19,13 @@ export default function MediaInfo({ folder, showHeader, genres, show }: PROPS) {
 
   // store states
   const likedShows = userStore((state: any) => state.userLiked);
-  const activeUser = userStore((state: any)=> state.userActive)
+  const activeUser = userStore((state: any) => state.userActive);
 
   const lickedUnlicked =
     likedShows.userSeries.includes(showHeader) ||
     likedShows.userMovies.includes(showHeader);
   const [waitForserver, setWaitForServer] = useState(false);
+  const safeGenres = Array.isArray(genres) ? genres : [];
 
   return (
     <BlurView
@@ -38,13 +38,15 @@ export default function MediaInfo({ folder, showHeader, genres, show }: PROPS) {
       </Text>
 
       <View className="flex flex-row mx-4">
-        {genres !== undefined &&
-          genres.map((genre) => (
-            <Text className="text-white font-lora text-lg" key={uuidv4()}>
-              {" "}
-              {genre}
-            </Text>
-          ))}
+        {safeGenres.map((genre, index) => (
+          <Text
+            className="text-white font-lora text-lg"
+            key={`${genre}-${index}`}
+          >
+            {" "}
+            {genre}
+          </Text>
+        ))}
       </View>
 
       <View className="p-2flex flex-row">

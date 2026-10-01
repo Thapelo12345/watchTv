@@ -44,7 +44,7 @@
         "expo-build-properties",
         {
           "android": {
-            "usesCleartextTraffic": true,
+            "usesCleartextTraffic": false,
             "largeHeap": true,
             "hardwareAccelerated": true,
             "extraProguardRules": "-keep class org.slf4j.** { *; }\n-dontwarn org.slf4j.**",
@@ -68,7 +68,8 @@
       "policy": "appVersion"
     },
     "updates": {
-      "url": "https://expo.dev"
+      "url": "https://u.expo.dev/2629bd8f-6468-4cf7-baeb-2849b9bea92f",
+      "checkAutomatically": "NEVER"
     }
   }
 }

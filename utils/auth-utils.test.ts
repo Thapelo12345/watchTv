@@ -1,4 +1,4 @@
-import { extractUserInfo } from "./auth-utils";
+import { extractUserInfo, sortMoviesByReleaseDate } from "./auth-utils";
 
 describe("extractUserInfo", () => {
   it("keeps the user fields used by the client", () => {
@@ -45,5 +45,51 @@ describe("extractUserInfo", () => {
       email: undefined,
       userLiked: undefined,
     });
+  });
+});
+
+describe("sortMoviesByReleaseDate", () => {
+  it("sorts by year, month, and day from releaseDate", () => {
+    const movies = [
+      {
+        movieHeader: "February",
+        movieYear: "2020",
+        releaseDate: "10 Feb 2020",
+      },
+      { movieHeader: "January", movieYear: "2020", releaseDate: "20 Jan 2020" },
+      {
+        movieHeader: "Later year",
+        movieYear: "2021",
+        releaseDate: "1 Mar 2021",
+      },
+    ];
+
+    expect(
+      sortMoviesByReleaseDate(movies).map((movie) => movie.movieHeader),
+    ).toEqual(["Later year", "February", "January"]);
+  });
+
+  it("sorts DD-MM-YYYY release dates chronologically", () => {
+    const movies = [
+      { movieHeader: "January", movieYear: "2020", releaseDate: "20-01-2020" },
+      { movieHeader: "February", movieYear: "2020", releaseDate: "05-02-2020" },
+      { movieHeader: "Later year", movieYear: "2021", releaseDate: "01-03-2021" },
+    ];
+
+    expect(
+      sortMoviesByReleaseDate(movies).map((movie) => movie.movieHeader),
+    ).toEqual(["Later year", "February", "January"]);
+  });
+
+  it("uses movieYear when releaseDate is missing", () => {
+    const movies = [
+      { movieHeader: "Older", movieYear: "2019", releaseDate: null },
+      { movieHeader: "Newer", movieYear: "2021", releaseDate: null },
+      { movieHeader: "Released", movieYear: "2018", releaseDate: "5 May 2020" },
+    ];
+
+    expect(
+      sortMoviesByReleaseDate(movies).map((movie) => movie.movieHeader),
+    ).toEqual(["Newer", "Released", "Older"]);
   });
 });

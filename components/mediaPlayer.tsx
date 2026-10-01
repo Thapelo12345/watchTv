@@ -26,16 +26,14 @@ export default function MediaScreen() {
     programme.seriesGenres ? programme.seriesGenres : programme.movieGenres;
 
   useEffect(() => {
-    if (movies.length !== 0 && series.length !== 0) {
+    if (movies.length !== 0 || series.length !== 0) {
+      allProgramms.current = [...movies, ...series].filter(Boolean);
+      if (allProgramms.current.length === 0) return;
 
-      if (allProgramms.current.length === 0) {
-        movies.map((movie: any) => {
-          allProgramms.current.push(movie);
-        });
-        series.map((serie: any) => {
-          allProgramms.current.push(serie);
-        });
-      }// end of inner if
+      const firstShow = allProgramms.current[0];
+      saveTo.current =
+        firstShow.seriesSeasons === undefined ? "movies" : "series";
+      setOldShow(firstShow);
 
       const slideCounter = setInterval(async () => {
         const randomNumber = Math.floor(
@@ -52,7 +50,9 @@ export default function MediaScreen() {
 
       return () => clearInterval(slideCounter);
     }
-  }, [movies, series, imagesDownloaded]);
+    allProgramms.current = [];
+    setOldShow(null);
+  }, [movies, series]);
 
   return (
     <View className="flex-1 items-center justify-center relative w-full h-115 -z-20 overflow-hidden">
@@ -62,7 +62,7 @@ export default function MediaScreen() {
         <Image
           className="absolute inset-0 bg-red-400"
           style={{ width: 425, height: 400 }}
-          source={{ uri: gettingImage(oldShow) }}
+          source={{ uri: gettingImage(oldShow) || undefined }}
           accessibilityLabel="Current Show image"
           transition={550}
           contentFit="fill"

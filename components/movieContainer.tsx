@@ -65,7 +65,7 @@ export default function MovieContainer({
           }}
           >
             <StarIcon color="gold" size={14} />
-            {rate}
+            {"  "}{rate}
           </Text>
           <Text
           style={{

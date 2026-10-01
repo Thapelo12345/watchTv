@@ -4,8 +4,9 @@ import {
   BackHandler,
   TouchableOpacity,
   Platform,
+  Alert,
 } from "react-native";
-import { WebView, WebViewNavigation } from "react-native-webview";
+import { WebView } from "react-native-webview";
 import { useMainStore } from "@/stateManagement/store";
 import * as ScreenOrientation from "expo-screen-orientation";
 import { useNavigation } from "expo-router";
@@ -279,7 +280,6 @@ true;
 
         if (data.message !== "Cloud Updated SuccessFully!..")
           throw new Error(data.message);
-
       } catch (err: unknown) {
         console.log(err instanceof Error ? err.message : "unknown error!..");
       }
@@ -306,8 +306,11 @@ true;
 
           if (!cloudUpdate.ok) throw new Error("Failed to update cloud!..");
           const data = await cloudUpdate.json();
-          if (data.message !== "Cloud Updated SuccessFully!..")throw new Error(data.message);
-        } catch (err: unknown) {return}
+          if (data.message !== "Cloud Updated SuccessFully!..")
+            throw new Error(data.message);
+        } catch (err: unknown) {
+          return;
+        }
       }
 
       if (
@@ -329,21 +332,37 @@ true;
           const data = await cloudUpdate.json();
           if (data.message !== "Cloud SuccessFully Updated!.")
             throw new Error(data.message);
-        } catch (err: unknown) {return }
+        } catch (err: unknown) {
+          return;
+        }
       }
-    } 
-    // else if (messageData.type === "VIDEO_NOT-FOUND") {
-    //   console.log(
-    //     "Video not found or link broken. Please check the URL or contact support.",
-    //   );
-    // }
+    } else if (
+      messageData.type === "VIDEO_ERROR" ||
+      messageData.type === "VIDEO_NOT-FOUND"
+    ) {
+      console.warn("Video playback error:", messageData);
+      // TODO: this is where the player error occurs; add recovery handling here.
+    }
+  };
+
+  const handleBack = async () => {
+    turnOffPlay(false);
+
+    try {
+      await ScreenOrientation.lockAsync(
+        ScreenOrientation.OrientationLock.PORTRAIT_UP,
+      );
+    } finally {
+      if (Platform.OS === "android") {
+        await NavigationBar.setVisibilityAsync("visible");
+      }
+      navigation.goBack();
+    }
   };
 
   useEffect(() => {
     const backAction = () => {
-      ScreenOrientation.lockAsync(
-        ScreenOrientation.OrientationLock.PORTRAIT_UP,
-      );
+      void handleBack();
       return true;
     };
 
@@ -358,9 +377,10 @@ true;
       ScreenOrientation.lockAsync(
         ScreenOrientation.OrientationLock.PORTRAIT_UP,
       );
-      if (Platform.OS === "android") NavigationBar.setVisibilityAsync("visible");
+      if (Platform.OS === "android")
+        NavigationBar.setVisibilityAsync("visible");
     };
-  }, []);
+  }, [navigation, turnOffPlay]);
 
   return (
     <View className="flex-1 bg-black">
@@ -377,26 +397,32 @@ true;
           injectedJavaScript={SERVER1_INJECTED_JAVASCRIPT}
           onMessage={handleMessage}
           // Local fallback intercept for primary domain SSL issues
-          onReceivedSslError={(syntheticEvent: any) => {
-            syntheticEvent.preventDefault();
-          }}
-          onShouldStartLoadWithRequest={(request: WebViewNavigation) => {
-            return request.url === playableUrl;
-          }}
+          onReceivedSslError={(syntheticEvent: any) => {syntheticEvent.preventDefault();}}
           // Catch basic network dropouts or loading failures
           onError={(syntheticEvent) => {
             const { nativeEvent } = syntheticEvent;
             console.warn("WebView error: ", nativeEvent.description);
+            // TODO: this is where the WebView load error occurs; add recovery handling here.
+            Alert.alert("NETWORK ERROR!.", "Failed to load video player!.., Try another Programme!.");
+            navigation.goBack();
+          }}
+          onHttpError={(syntheticEvent) => {
+            const { nativeEvent } = syntheticEvent;
+            console.warn("WebView HTTP error:", {
+              url: nativeEvent.url,
+              statusCode: nativeEvent.statusCode,
+              description: nativeEvent.description,
+            });
+            // TODO: this is where the HTTP error occurs; add recovery handling here.
+            Alert.alert("NETWORK ERROR!.", "Failed to load video player!.., Try another Programme!.");
+            navigation.goBack();
           }}
         />
       </View>
 
       {Platform.OS === "ios" && (
         <TouchableOpacity
-          onPress={() => {
-            turnOffPlay(false);
-            navigation.goBack();
-          }}
+          onPress={() => void handleBack()}
           className="absolute top-6 left-6 w-12 h-12 bg-black/60 rounded-full items-center justify-center z-50"
         >
           <Text className="text-white text-xl font-bold">✕</Text>

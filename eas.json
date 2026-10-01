@@ -10,7 +10,7 @@
       "android": {
         "buildType": "apk"
       },
-      "env": {},
+      "environment": "development",
       "channel": "development"
     },
     "preview": {
@@ -18,20 +18,25 @@
       "android": {
         "buildType": "apk"
       },
-      "env": {},
+      "environment": "preview",
       "channel": "preview"
+    },
+    "production_apk": {
+      "distribution": "internal",
+      "autoIncrement": true,
+      "android": {
+        "buildType": "apk"
+      },
+      "environment": "production",
+      "channel": "production"
     },
     "production": {
       "distribution": "store",
       "autoIncrement": true,
-      "android": {
-        "buildType": "apk",
-        "gradleCommand": ":app:assembleRelease"
-      },
       "ios": {
         "simulator": false
       },
-      "env": {},
+      "environment": "production",
       "channel": "production"
     }
   }

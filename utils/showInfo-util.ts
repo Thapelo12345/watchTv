@@ -54,6 +54,7 @@ async function Play(
           Title: showToPlay.programme.movieHeader,
         }),
       });
+      
       if (!response.ok) {
         Alert.alert("BAD NETWORK", "NetworkError!", [
           { text: "OK", onPress: () => playLoader(false) },
@@ -74,6 +75,7 @@ async function Play(
     } //end of if
     setPlayingUrl(currentUrl);
   } //of if its a series if statement
+
   else {
     if (!showToPlay || !showToPlay.programme.seriesSeasons) {
       Alert.alert("Series Error", "Series has now season and episodes!.", [
@@ -180,4 +182,27 @@ async function upDateLickedShows(
 
 } //end of update licked shows functions
 
-export { Play, upDateLickedShows };
+function hasSevenDaysPassed(dateString: string): boolean {
+  const MS_PER_DAY = 24 * 60 * 60 * 1000;
+  const SEVEN_DAYS_MS = 7 * MS_PER_DAY;
+
+  // Parse the input strictly as UTC midnight to avoid timezone drift.
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateString);
+  if (!match) {
+    throw new Error(`Invalid date format: "${dateString}". Expected "YYYY-MM-DD".`);
+  }
+
+  const [, year, month, day] = match.map(Number) as unknown as number[];
+  const inputDate = Date.UTC(year, month - 1, day); // month is 0-indexed
+
+  // Current time in UTC.
+  const now = Date.now();
+
+  // Difference in milliseconds.
+  const diffMs = now - inputDate;
+
+  // 7 full days (168 hours) must have elapsed.
+  return diffMs >= SEVEN_DAYS_MS;
+}//end of seven days passed function
+
+export { Play, upDateLickedShows, hasSevenDaysPassed };

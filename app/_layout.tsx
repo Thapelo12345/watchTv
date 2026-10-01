@@ -1,4 +1,4 @@
-import 'expo-crypto';
+import "expo-crypto";
 import { DarkTheme, ThemeProvider } from "@react-navigation/native";
 import { Stack } from "expo-router";
 import { Text } from "react-native";
@@ -12,7 +12,7 @@ import * as WebBrowser from "expo-web-browser";
 import { useTheme } from "@/constants/myTheme";
 import UpdateComponent from "@/components/updateComponent";
 import Auth from "@/components/authComponent";
-import SuperBaseAuth from '@/components/superBaseAuth';
+import SuperBaseAuth from "@/components/superBaseAuth";
 import "../global.css";
 
 WebBrowser.maybeCompleteAuthSession();
@@ -28,7 +28,7 @@ export default function RootLayout() {
     },
   };
 
-  const [fontsLoaded] = useFonts({
+  const [fontsLoaded, fontError] = useFonts({
     Lobster_400Regular,
     Lora_700Bold,
   });
@@ -39,15 +39,21 @@ export default function RootLayout() {
 
   // warming up the browser
   useEffect(() => {
-    WebBrowser.warmUpAsync();
+    WebBrowser.warmUpAsync().catch((error) => {
+      console.warn("Web browser warm-up failed", error);
+    });
     return () => {
-      WebBrowser.coolDownAsync();
+      WebBrowser.coolDownAsync().catch((error) => {
+        console.warn("Web browser cool-down failed", error);
+      });
     };
   }, []);
 
-  useEffect(() => {setShowPlaying(a_show_is_playing);}, [a_show_is_playing]);
+  useEffect(() => {
+    setShowPlaying(a_show_is_playing);
+  }, [a_show_is_playing]);
 
-  if (!fontsLoaded) {
+  if (!fontsLoaded && !fontError) {
     return (
       <SafeAreaProvider>
         <SafeAreaView
@@ -65,7 +71,7 @@ export default function RootLayout() {
   }
 
   return (
-      <>
+    <>
       <ThemeProvider value={MyGlobalCustomTheme}>
         <SafeAreaProvider>
           <SafeAreaView
@@ -96,6 +102,6 @@ export default function RootLayout() {
           </SafeAreaView>
         </SafeAreaProvider>
       </ThemeProvider>
-      </>
+    </>
   );
 }

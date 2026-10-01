@@ -5,7 +5,6 @@ import { UserCircleIcon } from "react-native-heroicons/solid";
 import { useMainStore } from "@/stateManagement/store";
 import { userStore } from "@/stateManagement/userStore";
 import {
-  getCloudUser,
   getAllProgrammes,
   getLatestProgrames,
   getNewShows,
@@ -37,21 +36,25 @@ export default function Auth() {
   const mediaFilePlaying = useMainStore((state: any) => state.playing);
   const imagesDownloaded = useMainStore((state: any) => state.imagesDownloaded);
 
-  const activeUser = userStore((state: any)=> state.userActive)
+  const activeUser = userStore((state: any) => state.userActive);
 
   // store action states
-  const setImageDownloaded = useMainStore((state: any) => state.setImageDownloaded);
+  const setImageDownloaded = useMainStore(
+    (state: any) => state.setImageDownloaded,
+  );
   const setTheme = userStore((state: any) => state.setUserTheme);
 
-  const setOpenAuthModal = useMainStore((state: any)=> state.setOpenAuthModal)
-  const setActiveUser = userStore((state: any) => state.setUserActive)
+  const setOpenAuthModal = useMainStore((state: any) => state.setOpenAuthModal);
+  const setActiveUser = userStore((state: any) => state.setUserActive);
 
   // this is the store functions runing the app updates
   const setAppUpdate = useMainStore((state: any) => state.setAppUpdate);
-  const setAppUpdateMessage = useMainStore((state: any) => state.setAppUpdateMessage);
+  const setAppUpdateMessage = useMainStore(
+    (state: any) => state.setAppUpdateMessage,
+  );
 
   const startedGettingUrls = useRef(false);
-  const updateDate = useRef<string | null>(null);
+  const dateToUpdateProgrammes = useRef<string | null>(null);
 
   const appUpdatesRuning = useRef(false);
   const loadingProgrammes = useRef(false);
@@ -63,7 +66,7 @@ export default function Auth() {
     try {
       const savedUpdatedate = await AsyncStorage.getItem("DATE_UPDATE");
       if (!savedUpdatedate) throw new Error("No System save Date!.");
-      updateDate.current = savedUpdatedate;
+      dateToUpdateProgrammes.current = savedUpdatedate;
     } catch (err: unknown) {
       return generateNewUpdateDate();
     }
@@ -90,7 +93,7 @@ export default function Auth() {
   };
 
   function generateNewUpdateDate() {
-    const today = new Date("2026-08-17");
+    const today = new Date();
     const day = today.getDay();
     const daysLeftBeforeSunday = 7 - day;
 
@@ -122,22 +125,6 @@ export default function Auth() {
     getUpdateDate();
   }, [activeUser]);
 
-  // This is an auth useEffect
-  /*
-  useEffect(()=>{
-    const checkInitialSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (session) {
-      const loggedInUser = session.user
-      await getCloudUser(loggedInUser.id)
-      setActiveUser(true)
-
-    }//end of if
-    }
-
-    checkInitialSession()
-  }, [])
-*/
   // programe useEffect to get the latest programes from the server and update the store
   useEffect(() => {
     if (
@@ -151,16 +138,10 @@ export default function Auth() {
       getAllProgrammes()
         .then(() => console.log("Shows Recieved!,"))
         .catch((err: unknown) => {
-          const errMessage =
-            err instanceof Error ? err.message : "unknown server Error!...";
-
+          const errMessage = err instanceof Error ? err.message : "unknown server Error!...";
           console.error(errMessage);
-          Alert.alert(
-            "SERVER ERROR!.",
-            "Failed To Get Data From the Server\nApp Is Being Closed!..",
-            [
-              {
-                text: "Close App",
+          Alert.alert("SERVER ERROR!.", "Failed To Get Data From the Server\nApp Is Being Closed!..",
+            [{ text: "Close App",
                 onPress: () => {
                   Platform.OS === "android"
                     ? BackHandler.exitApp()
@@ -194,39 +175,37 @@ export default function Auth() {
 
   // setting up dates updates
   useEffect(() => {
-    if (!updateDate.current) updateDate.current = generateNewUpdateDate();
-    else {
-      // if today's date is greater than the update date so i should run an update
-      if (
-        new Date() >= new Date(updateDate.current) &&
-        !appUpdatesRuning.current
-      ) {
-        setAppUpdate(true);
-        appUpdatesRuning.current = true;
-        setAppUpdateMessage("Getting new Shows!.");
+    if (!dateToUpdateProgrammes.current)
+      dateToUpdateProgrammes.current = generateNewUpdateDate();
 
-        getNewShows()
-          .then(async () => {
-            setAppUpdateMessage("Finding latest Series Update!..");
-            await seriesLatestUpdates();
-          })
-          .catch((err: unknown) => {
-            const errMessage =
-              err instanceof Error
-                ? err.message
-                : "Failed to update DataBase!.";
-            console.error(errMessage);
-          })
-          .finally(() => {
-            setAppUpdate(false);
-            appUpdatesRuning.current = false;
-          });
+    // if today's date is greater than the update date so i should run an update
+    if (
+      new Date() >= new Date(dateToUpdateProgrammes.current) &&
+      !appUpdatesRuning.current
+    ) {
+      setAppUpdate(true);
+      appUpdatesRuning.current = true;
+      setAppUpdateMessage("Getting new Shows!.");
 
-        updateDate.current = generateNewUpdateDate();
-        setUpdateDate(updateDate.current);
-      } //end of inner statement
-    }
-  }, [updateDate]);
+      getNewShows()
+        .then(async () => {
+          setAppUpdateMessage("Finding latest Series Update!..");
+          await seriesLatestUpdates();
+        })
+        .catch((err: unknown) => {
+          const errMessage =
+            err instanceof Error ? err.message : "Failed to update DataBase!.";
+          Alert.alert("UPDATE ERROR!.", errMessage);
+        })
+        .finally(() => {
+          setAppUpdate(false);
+          appUpdatesRuning.current = false;
+        });
+
+      dateToUpdateProgrammes.current = generateNewUpdateDate();
+      setUpdateDate(dateToUpdateProgrammes.current);
+    } //end of inner statement
+  }, [dateToUpdateProgrammes]);
 
   return (
     <View
@@ -255,16 +234,15 @@ export default function Auth() {
 
       <Pressable
         onPress={async () => {
-        if(!activeUser) setOpenAuthModal(true)
-        else{
-           const { error } = await supabase.auth.signOut()
-          if (error) {
-            Alert.alert("LOGOUT ERROR!.", error.message)
-            return
+          if (!activeUser) setOpenAuthModal(true);
+          else {
+            const { error } = await supabase.auth.signOut();
+            if (error) {
+              Alert.alert("LOGOUT ERROR!.", error.message);
+              return;
+            }
+            setActiveUser(false);
           }
-
-          setActiveUser(false)
-        }
         }}
       >
         <Text className="auth-btn">Sign {activeUser ? "Out" : "In"}</Text>

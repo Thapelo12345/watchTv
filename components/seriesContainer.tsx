@@ -66,7 +66,7 @@ export default function SeriesContainer({
             color: theme.text
           }}
           >
-            <StarIcon color="gold" size={10} /> {rate}
+            <StarIcon color="gold" size={10} /> {" "}{rate}
           </Text>
           <Text
           style={{
